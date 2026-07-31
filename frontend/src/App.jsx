@@ -1,11 +1,19 @@
-
+import {Routes,Route} from 'react-router-dom'
+import Login from './pages/Login'
+import AdminDashboard from './pages/dashboard/AdminDashboard'
 
 function App() {
 
 
   return (
     <div>
-        <h1 className="bg-red-600">hallo</h1>
+        <Routes>
+            <Route path='/login' element={<Login/>}/>
+            <Route
+                path="/admin/dashboard"
+                element={<AdminDashboard />}
+            />
+        </Routes>
     </div>
   )
 }
