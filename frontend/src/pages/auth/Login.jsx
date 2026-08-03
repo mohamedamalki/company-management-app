@@ -10,7 +10,7 @@ import {
     Mail,
     ShieldCheck,
 } from "lucide-react";
-import api from "../api/axios";
+import api from "../../api/axios";
 
 const initialForm = {
     email: "",
