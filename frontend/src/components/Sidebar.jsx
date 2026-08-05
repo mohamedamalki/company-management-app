@@ -5,7 +5,9 @@ import {
     Package,
     Users,
     X,
-    Tags
+    Tags,
+    Badge,
+    MapPinned
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -17,9 +19,11 @@ const navigation = [
         end: true,
     },
     { label: "Users", to: "/admin/users", icon: Users },
-    { label: "Depots", to: "/admin/depots", icon: Building2 },
-    { label: "Products", to: "/admin/products", icon: Package },
+    { label: "locations", to: "/admin/locations", icon: Building2 },
+    { label: "Location assignments", to: "/admin/location-assignments", icon: MapPinned   },
     { label: "Categories", to: "/admin/categories", icon: Tags  },
+    { label: "brands", to: "/admin/brands", icon: Badge   },
+    { label: "Products", to: "/admin/products", icon: Package },
 ];
 
 function getInitials(name = "Admin User") {

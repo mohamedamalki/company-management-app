@@ -18,16 +18,12 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $users = User::query()
-            ->with([
-                'depot:id,name,code',
-            ])
             ->select([
                 'id',
                 'name',
                 'email',
                 'role',
                 'status',
-                'depot_id',
                 'created_at',
             ])
             ->when(
@@ -86,9 +82,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User created successfully.',
-            'data' => $user->load(
-                'depot:id,name,code'
-            ),
+            'data' => $user
         ], 201);
     }
 
@@ -98,9 +92,7 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         return response()->json([
-            'data' => $user->load(
-                'depot:id,name,code'
-            ),
+            'data' => $user
         ]);
     }
 
@@ -130,7 +122,6 @@ class UserController extends Controller
             'message' => 'User updated successfully.',
             'data' => $user
                 ->fresh()
-                ->load('depot:id,name,code'),
         ]);
     }
 }

@@ -5,17 +5,21 @@ import DashboardLayout from './layouts/DashboardLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import GuestRoute from './components/GuestRoute'
 import UsersPage from './pages/users/UsersPage'
-import DepotsPage from './pages/depots/DepotsPage'
 import UsersCreate from './pages/users/UsersCreate'
 import UsersUpdate from './pages/users/UsersUpdate'
-import DepotsCreate from './pages/depots/DepotsCreate'
-import DepotsUpdate from './pages/depots/DepotsUpdate'
 import CategoriesPage from './pages/categories/CategoriesPage'
 import CategoriesCreate from './pages/categories/CategoriesCreate'
 import CategoriesUpdate from './pages/categories/CategoriesUpdate'
 import ProductsPage from './pages/products/ProductsPage'
 import ProductsCreate from './pages/products/ProductsCreate'
 import ProductsUpdate from './pages/products/ProductsUpdate'
+import LocationsPage from './pages/locations/LocationsPage'
+import LocationsCreate from './pages/locations/LocationsCreate'
+import LocationsUpdate from './pages/locations/LocationsUpdate'
+import BrandsPage from './pages/brands/BrandsPage'
+import BrandsCreate from './pages/brands/BrandsCreate'
+import BrandsUpdate from './pages/brands/BrandsUpdate'
+import LocationAssignmentsPage from './pages/locationAssignments/LocationAssignmentsPage'
 
 function App() {
 
@@ -32,18 +36,24 @@ function App() {
                 <Route path="users" element={<UsersPage />} />
                 <Route path="users/create" element={<UsersCreate />} />
                 <Route path="users/:id/edit" element={<UsersUpdate />} />
-
-                <Route path="depots" element={<DepotsPage />} />
-                <Route path="depots/create" element={<DepotsCreate />} />
-                <Route path="depots/:id/edit" element={<DepotsUpdate />} />
-
+                {/* locations routes */}
+                <Route path="locations" element={<LocationsPage />} />
+                <Route path="locations/create" element={<LocationsCreate />} />
+                <Route path="locations/:id/edit" element={<LocationsUpdate />} />
+                {/* ctegories routes */}
                 <Route path="categories" element={<CategoriesPage />} />
                 <Route path="categories/create" element={<CategoriesCreate />}/>
                 <Route path="categories/:id/edit" element={<CategoriesUpdate />}/>
-
+                {/* products routes */}
                 <Route path="products" element={<ProductsPage />} />
                 <Route path="products/create" element={<ProductsCreate />}/>
                 <Route path="products/:id/edit" element={<ProductsUpdate />}/>
+                {/* brands routes */}
+                <Route path="/admin/brands" element={<BrandsPage />}/>
+                <Route path="/admin/brands/create" element={<BrandsCreate />}/>
+                <Route path="/admin/brands/:id/edit" element={<BrandsUpdate />}/>
+
+                <Route path="location-assignments" element={<LocationAssignmentsPage />}/>
             </Route>
             </Route>
             <Route path="*" element={<Navigate to="/login" replace />}/>

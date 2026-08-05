@@ -107,7 +107,8 @@ export default function Login() {
 
                 <div className="relative z-10 my-auto max-w-lg">
                     <h1 className="text-5xl font-extrabold leading-[1.12] tracking-[-0.04em] xl:text-6xl">
-                        Run your company with Management-App.
+                        Run your company with <br/>
+                        <span>M-App.</span>
                     </h1>
 
                     <p className="mt-6 max-w-md text-lg leading-8 text-blue-100/80">

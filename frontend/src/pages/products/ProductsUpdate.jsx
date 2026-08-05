@@ -3,6 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api/axios";
 import ProductForm from "../../components/products/ProductForm";
 
+const getErrorMessage = (error, fallback) => {
+    const validationErrors = error.response?.data?.errors;
+
+    return validationErrors
+        ? Object.values(validationErrors).flat()[0]
+        : error.response?.data?.message ?? fallback;
+};
+
 function ProductsUpdate() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -17,9 +25,7 @@ function ProductsUpdate() {
 
         const loadProduct = async () => {
             try {
-                const response = await api.get(
-                    `/products/${id}`
-                );
+                const response = await api.get(`/products/${id}`);
 
                 const data =
                     response.data.data ??
@@ -29,12 +35,15 @@ function ProductsUpdate() {
                 if (!cancelled) {
                     setProduct(data);
                 }
-            } catch (error) {
-                console.error(error);
+            } catch (requestError) {
+                console.error("Unable to load product:", requestError);
 
                 if (!cancelled) {
                     setError(
-                        "Unable to load product."
+                        getErrorMessage(
+                            requestError,
+                            "Unable to load product."
+                        )
                     );
                 }
             } finally {
@@ -56,20 +65,17 @@ function ProductsUpdate() {
             setSaving(true);
             setError("");
 
-            await api.patch(
-                `/products/${id}`,
-                formData
-            );
+            await api.put(`/products/${id}`, formData);
 
-            navigate("/admin/products");
-        } catch (error) {
-            const errors = error.response?.data?.errors;
-
+            navigate("/admin/products", {
+                replace: true,
+            });
+        } catch (requestError) {
             setError(
-                errors
-                    ? Object.values(errors).flat()[0]
-                    : error.response?.data?.message ??
-                          "Unable to update product."
+                getErrorMessage(
+                    requestError,
+                    "Unable to update product."
+                )
             );
         } finally {
             setSaving(false);
@@ -77,22 +83,40 @@ function ProductsUpdate() {
     };
 
     if (loading) {
-        return <p className="p-8">Loading product...</p>;
+        return (
+            <div className="flex min-h-72 items-center justify-center gap-3 p-6">
+                <span className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900" />
+                <span className="text-sm text-slate-500">
+                    Loading product...
+                </span>
+            </div>
+        );
     }
 
     if (!product) {
         return (
-            <p className="p-8 text-red-600">
-                Product not found.
-            </p>
+            <div className="p-6">
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {error || "Product not found."}
+                </div>
+            </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6 lg:p-8">
-            <div className="mx-auto max-w-5xl">
+        <main className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto max-w-5xl space-y-6">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                        Update product
+                    </h1>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                        Update product identification, category, brand and prices.
+                    </p>
+                </div>
+
                 <ProductForm
-                    key={`update-product-${product.id}`}
                     initialData={product}
                     onSubmit={handleUpdate}
                     saving={saving}
@@ -100,7 +124,7 @@ function ProductsUpdate() {
                     submitText="Update product"
                 />
             </div>
-        </div>
+        </main>
     );
 }
 

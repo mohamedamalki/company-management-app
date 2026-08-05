@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -25,8 +26,7 @@ class User extends Authenticatable
         'email',
         'role',
         'status',
-        'password',
-        'depot_id'
+        'password'
     ];
 
     /**
@@ -52,8 +52,15 @@ class User extends Authenticatable
         ];
     }
 
-    public function depot(): BelongsTo
+    public function location(): BelongsTo
     {
-    return $this->belongsTo(Depot::class);
+    return $this->belongsTo(Location::class);
+    }
+
+    public function locationAssignment(): HasOne
+    {
+    return $this->hasOne(
+        LocationAssignment::class
+    );
     }
 }

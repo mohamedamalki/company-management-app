@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateDepotRequest extends FormRequest
+class UpdateLocationRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -42,6 +42,14 @@ class UpdateDepotRequest extends FormRequest
                     ->ignore($depot),
             ],
 
+            'type' => [
+                'required',
+                Rule::in([
+                    'depot',
+                    'magasin',
+                ]),
+            ],
+
             'address' => [
                 'sometimes',
                 'nullable',
@@ -70,9 +78,9 @@ class UpdateDepotRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'The depot name cannot be empty.',
-            'code.required' => 'The depot code cannot be empty.',
-            'code.unique' => 'This depot code already exists.',
+            'name.required' => 'The location name cannot be empty.',
+            'code.required' => 'The location code cannot be empty.',
+            'code.unique' => 'This location code already exists.',
             'status.in' => 'The status must be active or inactive.',
         ];
     }

@@ -207,9 +207,6 @@ function UsersPage() {
                                     <th className="px-5 py-3 font-medium text-slate-500">
                                         Status
                                     </th>
-                                    <th className="px-5 py-3 font-medium text-slate-500">
-                                        Depot
-                                    </th>
                                     <th className="px-5 py-3 text-right font-medium text-slate-500">
                                         Actions
                                     </th>
@@ -308,13 +305,6 @@ function UsersPage() {
                                                     {user.status}
                                                 </span>
                                             </td>
-
-                                            <td className="px-5 py-3.5 text-slate-600">
-                                                {user.depot ? user.depot.name : (
-                                                    <span className="text-slate-300">—</span>
-                                                )}
-                                            </td>
-
                                             <td className="px-5 py-3.5">
                                                 <div className="flex justify-end gap-2">
                                                     <Link

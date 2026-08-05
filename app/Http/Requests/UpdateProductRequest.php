@@ -121,6 +121,12 @@ class UpdateProductRequest extends FormRequest
                     'meter',
                 ]),
             ],
+
+            'brand_id' => [
+                'nullable',
+                'integer',
+                'exists:brands,id',
+            ],
         ];
     }
 }

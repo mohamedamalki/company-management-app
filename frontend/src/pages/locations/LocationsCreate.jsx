@@ -1,18 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
-import ProductForm from "../../components/products/ProductForm";
+import LocationForm from "../../components/locations/LocationForm";
 
-const getErrorMessage = (error, fallback) => {
-    const validationErrors = error.response?.data?.errors;
-
-    return validationErrors
-        ? Object.values(validationErrors).flat()[0]
-        : error.response?.data?.message ?? fallback;
-};
-
-function ProductsCreate() {
+function LocationsCreate() {
     const navigate = useNavigate();
+
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
@@ -21,17 +14,25 @@ function ProductsCreate() {
             setSaving(true);
             setError("");
 
-            await api.post("/products", formData);
+            await api.post(
+                "/locations",
+                formData
+            );
 
-            navigate("/admin/products", {
+            navigate("/admin/locations", {
                 replace: true,
             });
-        } catch (requestError) {
+        } catch (error) {
+            const validationErrors =
+                error.response?.data?.errors;
+
             setError(
-                getErrorMessage(
-                    requestError,
-                    "Unable to create product."
-                )
+                validationErrors
+                    ? Object.values(
+                          validationErrors
+                      ).flat()[0]
+                    : error.response?.data?.message ??
+                          "Unable to create location."
             );
         } finally {
             setSaving(false);
@@ -43,23 +44,23 @@ function ProductsCreate() {
             <div className="mx-auto max-w-5xl space-y-6">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                        Create product
+                        Create location
                     </h1>
 
                     <p className="mt-1 text-sm text-slate-500">
-                        Add a new product and assign its category and brand.
+                        Add a new depot or magasin.
                     </p>
                 </div>
 
-                <ProductForm
+                <LocationForm
                     onSubmit={handleCreate}
                     saving={saving}
                     error={error}
-                    submitText="Create product"
+                    submitText="Create location"
                 />
             </div>
         </main>
     );
 }
 
-export default ProductsCreate;
+export default LocationsCreate;

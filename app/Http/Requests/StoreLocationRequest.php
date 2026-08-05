@@ -5,21 +5,11 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreDepotRequest extends FormRequest
+class StoreLocationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Authorization is handled by auth:sanctum and role:admin.
-        return true;
-    }
-
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('code')) {
-            $this->merge([
-                'code' => strtoupper(trim($this->code)),
-            ]);
-        }
+        return $this->user()?->role === 'admin';
     }
 
     public function rules(): array
@@ -35,13 +25,21 @@ class StoreDepotRequest extends FormRequest
                 'required',
                 'string',
                 'max:50',
-                'unique:depots,code',
+                'unique:locations,code',
+            ],
+
+            'type' => [
+                'required',
+                Rule::in([
+                    'depot',
+                    'magasin',
+                ]),
             ],
 
             'address' => [
                 'nullable',
                 'string',
-                'max:500',
+                'max:255',
             ],
 
             'phone' => [
@@ -60,13 +58,14 @@ class StoreDepotRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
+    protected function prepareForValidation(): void
     {
-        return [
-            'name.required' => 'The depot name is required.',
-            'code.required' => 'The depot code is required.',
-            'code.unique' => 'This depot code already exists.',
-            'status.in' => 'The status must be active or inactive.',
-        ];
+        if ($this->has('code')) {
+            $this->merge([
+                'code' => strtoupper(
+                    trim($this->code)
+                ),
+            ]);
+        }
     }
 }

@@ -4,24 +4,29 @@ import { Link } from "react-router-dom";
 const initialForm = {
     name: "",
     code: "",
+    type: "depot",
     address: "",
     phone: "",
     status: "active",
 };
 
-function DepotForm({
+function LocationForm({
     initialData = initialForm,
     onSubmit,
-    saving,
-    error,
-    submitText,
+    saving = false,
+    error = "",
+    submitText = "Save location",
 }) {
-    const [formData, setFormData] = useState({
+    const isEditing = Boolean(initialData?.id);
+
+    const [formData, setFormData] = useState(() => ({
         ...initialForm,
         ...initialData,
+        type: initialData.type ?? "depot",
         address: initialData.address ?? "",
         phone: initialData.phone ?? "",
-    });
+        status: initialData.status ?? "active",
+    }));
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -42,7 +47,9 @@ function DepotForm({
         onSubmit({
             ...formData,
             name: formData.name.trim(),
-            code: formData.code.trim().toUpperCase(),
+            code: formData.code
+                .trim()
+                .toUpperCase(),
             address: formData.address.trim(),
             phone: formData.phone.trim(),
         });
@@ -51,13 +58,15 @@ function DepotForm({
     const inputClass =
         "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
 
-    const selectClass = `${inputClass} appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%221.5%22><path stroke-linecap=%22round%22 stroke-linejoin=%22round%22 d=%22M6 8l4 4 4-4%22/></svg>')] bg-[right_0.75rem_center] bg-no-repeat pr-9`;
+    const selectClass = `${inputClass} appearance-none`;
 
     const labelClass =
         "mb-1.5 block text-sm font-medium text-slate-700";
 
     const requiredMark = (
-        <span className="ml-1 text-red-500">*</span>
+        <span className="ml-1 text-red-500">
+            *
+        </span>
     );
 
     return (
@@ -68,15 +77,15 @@ function DepotForm({
         >
             {/* Header */}
             <div className="flex items-start gap-3 border-b border-slate-200 bg-slate-50/80 px-6 py-5">
-                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-slate-900 text-white">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white">
                     <svg
-                        className="h-4.5 w-4.5"
+                        className="h-5 w-5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                         strokeWidth={2}
                     >
-                        {initialData.id ? (
+                        {isEditing ? (
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -94,14 +103,14 @@ function DepotForm({
 
                 <div>
                     <h2 className="text-lg font-semibold tracking-tight text-slate-900">
-                        {initialData.id
-                            ? "Update depot information"
-                            : "New depot information"}
+                        {isEditing
+                            ? "Update location information"
+                            : "New location information"}
                     </h2>
 
                     <p className="mt-0.5 text-sm text-slate-500">
-                        Enter the depot identification, contact
-                        and availability information.
+                        Enter the location identification,
+                        type and contact information.
                     </p>
                 </div>
             </div>
@@ -109,9 +118,12 @@ function DepotForm({
             <div className="p-6">
                 {/* Error */}
                 {error && (
-                    <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    <div
+                        role="alert"
+                        className="mb-6 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                    >
                         <svg
-                            className="mt-0.5 h-4 w-4 flex-shrink-0"
+                            className="mt-0.5 h-4 w-4 shrink-0"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -129,12 +141,13 @@ function DepotForm({
                 )}
 
                 {/* Identification */}
-                <div className="mb-6">
+                <section className="mb-7">
                     <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Depot identification
+                        Location identification
                     </h3>
 
                     <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
+                        {/* Name */}
                         <div>
                             <label
                                 htmlFor="name"
@@ -150,14 +163,14 @@ function DepotForm({
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                placeholder="Enter the depot name"
+                                placeholder="Enter the location name"
                                 className={inputClass}
-                                autoComplete="off"
                                 disabled={saving}
                                 required
                             />
                         </div>
 
+                        {/* Code */}
                         <div>
                             <label
                                 htmlFor="code"
@@ -173,71 +186,53 @@ function DepotForm({
                                 name="code"
                                 value={formData.code}
                                 onChange={handleChange}
-                                placeholder="Example: DEPOT-01"
+                                placeholder="Example: LOC-01"
                                 className={`${inputClass} uppercase`}
-                                autoComplete="off"
                                 disabled={saving}
                                 required
                             />
 
                             <p className="mt-1.5 text-xs text-slate-500">
-                                The code is automatically converted
-                                to uppercase.
+                                The code is automatically
+                                converted to uppercase.
                             </p>
                         </div>
-                    </div>
-                </div>
 
-                {/* Contact and status */}
-                <div>
-                    <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Contact &amp; availability
-                    </h3>
-
-                    <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
+                        {/* Location type */}
                         <div>
                             <label
-                                htmlFor="address"
+                                htmlFor="type"
                                 className={labelClass}
                             >
-                                Address
+                                Location type
+                                {requiredMark}
                             </label>
 
-                            <input
-                                id="address"
-                                type="text"
-                                name="address"
-                                value={formData.address}
+                            <select
+                                id="type"
+                                name="type"
+                                value={formData.type}
                                 onChange={handleChange}
-                                placeholder="Enter the depot address"
-                                className={inputClass}
-                                autoComplete="street-address"
+                                className={selectClass}
                                 disabled={saving}
-                            />
-                        </div>
-
-                        <div>
-                            <label
-                                htmlFor="phone"
-                                className={labelClass}
+                                required
                             >
-                                Phone
-                            </label>
+                                <option value="depot">
+                                    Depot
+                                </option>
 
-                            <input
-                                id="phone"
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                placeholder="Example: 0567804321"
-                                className={inputClass}
-                                autoComplete="tel"
-                                inputMode="tel"
-                                disabled={saving}
-                            />
+                                <option value="magasin">
+                                    Magasin
+                                </option>
+                            </select>
+
+                            <p className="mt-1.5 text-xs text-slate-500">
+                                Select how this location is
+                                used by the company.
+                            </p>
                         </div>
 
+                        {/* Status */}
                         <div>
                             <label
                                 htmlFor="status"
@@ -266,13 +261,67 @@ function DepotForm({
                             </select>
                         </div>
                     </div>
-                </div>
+                </section>
+
+                {/* Contact information */}
+                <section>
+                    <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Contact information
+                    </h3>
+
+                    <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
+                        {/* Address */}
+                        <div>
+                            <label
+                                htmlFor="address"
+                                className={labelClass}
+                            >
+                                Address
+                            </label>
+
+                            <input
+                                id="address"
+                                type="text"
+                                name="address"
+                                value={formData.address}
+                                onChange={handleChange}
+                                placeholder="Enter the location address"
+                                className={inputClass}
+                                autoComplete="street-address"
+                                disabled={saving}
+                            />
+                        </div>
+
+                        {/* Phone */}
+                        <div>
+                            <label
+                                htmlFor="phone"
+                                className={labelClass}
+                            >
+                                Phone
+                            </label>
+
+                            <input
+                                id="phone"
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                placeholder="Example: 0567804321"
+                                className={inputClass}
+                                autoComplete="tel"
+                                inputMode="tel"
+                                disabled={saving}
+                            />
+                        </div>
+                    </div>
+                </section>
             </div>
 
             {/* Actions */}
             <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50/80 px-6 py-4 sm:flex-row sm:justify-end">
                 <Link
-                    to="/admin/depots"
+                    to="/admin/locations"
                     className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                 >
                     Cancel
@@ -306,11 +355,13 @@ function DepotForm({
                         </svg>
                     )}
 
-                    {saving ? "Saving..." : submitText}
+                    {saving
+                        ? "Saving..."
+                        : submitText}
                 </button>
             </div>
         </form>
     );
 }
 
-export default DepotForm;
+export default LocationForm;

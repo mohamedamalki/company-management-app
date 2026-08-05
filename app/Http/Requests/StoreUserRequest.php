@@ -50,6 +50,7 @@ class StoreUserRequest extends FormRequest
                 Rule::in([
                     'responsable',
                     'fournisseur',
+                    'admin'
                 ]),
             ],
 
@@ -59,16 +60,6 @@ class StoreUserRequest extends FormRequest
                     'active',
                     'inactive',
                 ]),
-            ],
-            'depot_id' => [
-                Rule::requiredIf(
-                fn () => $this->input('role') === 'responsable'
-                ),
-                'nullable',
-                'integer',
-                Rule::exists('depots', 'id')->where(
-                fn ($query) => $query->where('status', 'active')
-                ),
             ],
         ];
     }

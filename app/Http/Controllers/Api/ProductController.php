@@ -15,12 +15,22 @@ class ProductController extends Controller
         Request $request
     ): JsonResponse {
         $products = Product::query()
-            ->with('category:id,name')
+            ->with([
+                'category:id,name',
+                'brand:id,name',
+            ])
             ->when(
                 $request->filled('category_id'),
                 fn ($query) => $query->where(
                     'category_id',
                     $request->category_id
+                )
+            )
+            ->when(
+                $request->filled('brand_id'),
+                fn ($query) => $query->where(
+                    'brand_id',
+                    $request->brand_id
                 )
             )
             ->when(
@@ -74,9 +84,10 @@ class ProductController extends Controller
             'message' =>
                 'Product created successfully.',
 
-            'data' => $product->load(
-                'category:id,name'
-            ),
+            'data' => $product->load([
+                'category:id,name',
+                'brand:id,name',
+            ]),
         ], 201);
     }
 
@@ -84,9 +95,10 @@ class ProductController extends Controller
         Product $product
     ): JsonResponse {
         return response()->json([
-            'data' => $product->load(
-                'category:id,name'
-            ),
+            'data' => $product->load([
+                'category:id,name',
+                'brand:id,name',
+            ]),
         ]);
     }
 
@@ -104,7 +116,10 @@ class ProductController extends Controller
 
             'data' => $product
                 ->fresh()
-                ->load('category:id,name'),
+                ->load([
+                    'category:id,name',
+                    'brand:id,name',
+                ]),
         ]);
     }
 }

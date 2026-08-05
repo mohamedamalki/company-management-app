@@ -28,6 +28,11 @@ return new class extends Migration
         ->nullable()
         ->unique();
 
+    $table->foreignId('brand_id')
+        ->nullable()
+        ->constrained('brands')
+        ->nullOnDelete();
+
     $table->text('description')->nullable();
 
     $table->decimal(

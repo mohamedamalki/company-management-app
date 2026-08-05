@@ -17,11 +17,17 @@ class Product extends Model
         'sale_price',
         'unit',
         'status',
+        'brand_id'
     ];
 
 
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function brand(): BelongsTo
+    {
+    return $this->belongsTo(Brand::class);
     }
 }
