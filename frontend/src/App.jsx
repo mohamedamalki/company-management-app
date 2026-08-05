@@ -20,6 +20,9 @@ import BrandsPage from './pages/brands/BrandsPage'
 import BrandsCreate from './pages/brands/BrandsCreate'
 import BrandsUpdate from './pages/brands/BrandsUpdate'
 import LocationAssignmentsPage from './pages/locationAssignments/LocationAssignmentsPage'
+import PaymentMethodsPage from './pages/paymentMethods/PaymentMethodsPage'
+import PaymentMethodsCreate from './pages/paymentMethods/PaymentMethodsCreate'
+import PaymentMethodsUpdate from './pages/paymentMethods/PaymentMethodsUpdate'
 
 function App() {
 
@@ -54,6 +57,12 @@ function App() {
                 <Route path="/admin/brands/:id/edit" element={<BrandsUpdate />}/>
 
                 <Route path="location-assignments" element={<LocationAssignmentsPage />}/>
+
+                <Route path="payment-methods" element={<PaymentMethodsPage />}/>
+
+                <Route path="payment-methods/create" element={<PaymentMethodsCreate />}/>
+
+                <Route path="payment-methods/:id/edit" element={<PaymentMethodsUpdate />}/>
             </Route>
             </Route>
             <Route path="*" element={<Navigate to="/login" replace />}/>

@@ -3,47 +3,103 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePaymentMethodRequest;
+use App\Http\Requests\UpdatePaymentMethodRequest;
+use App\Models\PaymentMethod;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PaymentMethodController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Admin list: includes active and inactive methods.
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        //
+        $perPage = min(
+            max((int) $request->input('per_page', 15), 1),
+            100
+        );
+
+        $paymentMethods = PaymentMethod::query()
+            ->when(
+                $request->filled('status'),
+                fn ($query) => $query->where(
+                    'status',
+                    $request->status
+                )
+            )
+            ->when(
+                $request->filled('search'),
+                function ($query) use ($request) {
+                    $search = trim($request->search);
+
+                    $query->where(function ($query) use ($search) {
+                        $query
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%");
+                    });
+                }
+            )
+            ->orderBy('name')
+            ->paginate($perPage);
+
+        return response()->json($paymentMethods);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simple active list used in the sale form.
      */
-    public function store(Request $request)
+    public function active(): JsonResponse
     {
-        //
+        $paymentMethods = PaymentMethod::query()
+            ->select([
+                'id',
+                'name',
+                'code',
+                'requires_reference',
+            ])
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'data' => $paymentMethods,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    public function store(
+        StorePaymentMethodRequest $request
+    ): JsonResponse {
+        $paymentMethod = PaymentMethod::create(
+            $request->validated()
+        );
+
+        return response()->json([
+            'message' => 'Payment method created successfully.',
+            'data' => $paymentMethod,
+        ], 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function show(
+        PaymentMethod $paymentMethod
+    ): JsonResponse {
+        return response()->json([
+            'data' => $paymentMethod,
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+    public function update(
+        UpdatePaymentMethodRequest $request,
+        PaymentMethod $paymentMethod
+    ): JsonResponse {
+        $paymentMethod->update(
+            $request->validated()
+        );
+
+        return response()->json([
+            'message' => 'Payment method updated successfully.',
+            'data' => $paymentMethod->fresh(),
+        ]);
     }
 }

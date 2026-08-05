@@ -7,7 +7,8 @@ import {
     X,
     Tags,
     Badge,
-    MapPinned
+    MapPinned,
+    WalletCards
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -24,6 +25,7 @@ const navigation = [
     { label: "Categories", to: "/admin/categories", icon: Tags  },
     { label: "brands", to: "/admin/brands", icon: Badge   },
     { label: "Products", to: "/admin/products", icon: Package },
+    { label: "Payment methods", to: "/admin/payment-methods", icon: WalletCards },
 ];
 
 function getInitials(name = "Admin User") {
