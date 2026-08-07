@@ -2,22 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
+    use HasFactory, SoftDeletes;
+
         protected $fillable = [
         'category_id',
+        'brand_id',
         'name',
-        'sku',
-        'barcode',
+        'reference',
         'description',
-        'purchase_price',
-        'sale_price',
         'unit',
-        'status',
-        'brand_id'
     ];
 
 
@@ -29,5 +31,18 @@ class Product extends Model
     public function brand(): BelongsTo
     {
     return $this->belongsTo(Brand::class);
+    }
+
+    public function prices(): HasMany
+    {
+    return $this->hasMany(ProductPrice::class);
+    }
+
+    public function currentGlobalPrice(): HasOne
+    {
+    return $this->hasOne(ProductPrice::class)
+        ->whereNull('location_id')
+        ->where('status', 'active')
+        ->latestOfMany('starts_at');
     }
 }

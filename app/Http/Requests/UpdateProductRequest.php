@@ -22,15 +22,9 @@ class UpdateProductRequest extends FormRequest
             );
         }
 
-        if ($this->has('sku')) {
-            $data['sku'] = strtoupper(
-                trim($this->input('sku'))
-            );
-        }
-
-        if ($this->has('barcode')) {
-            $data['barcode'] = $this->filled('barcode')
-                ? trim($this->input('barcode'))
+        if ($this->has('reference')) {
+            $data['reference'] = $this->filled('reference')
+                ? strtoupper(trim($this->input('reference')))
                 : null;
         }
 
@@ -40,17 +34,32 @@ class UpdateProductRequest extends FormRequest
             );
         }
 
+        if ($this->has('description')) {
+            $data['description'] = $this->filled('description')
+                ? trim($this->input('description'))
+                : null;
+        }
+
         $this->merge($data);
     }
 
     public function rules(): array
     {
+        $product = $this->route('product');
+
         return [
             'category_id' => [
                 'sometimes',
                 'required',
                 'integer',
                 'exists:categories,id',
+            ],
+
+            'brand_id' => [
+                'sometimes',
+                'nullable',
+                'integer',
+                'exists:brands,id',
             ],
 
             'name' => [
@@ -60,21 +69,7 @@ class UpdateProductRequest extends FormRequest
                 'max:255',
             ],
 
-            'sku' => [
-                'sometimes',
-                'required',
-                'string',
-                'max:100',
-
-                Rule::unique(
-                    'products',
-                    'sku'
-                )->ignore(
-                    $this->route('product')
-                ),
-            ],
-
-            'barcode' => [
+            'reference' => [
                 'sometimes',
                 'nullable',
                 'string',
@@ -82,10 +77,8 @@ class UpdateProductRequest extends FormRequest
 
                 Rule::unique(
                     'products',
-                    'barcode'
-                )->ignore(
-                    $this->route('product')
-                ),
+                    'reference'
+                )->ignore($product),
             ],
 
             'description' => [
@@ -94,24 +87,9 @@ class UpdateProductRequest extends FormRequest
                 'string',
             ],
 
-            'purchase_price' => [
-                'sometimes',
-                'required',
-                'numeric',
-                'min:0',
-            ],
-
-            'sale_price' => [
-                'sometimes',
-                'required',
-                'numeric',
-                'min:0',
-            ],
-
             'unit' => [
                 'sometimes',
                 'required',
-
                 Rule::in([
                     'piece',
                     'kg',
@@ -120,12 +98,6 @@ class UpdateProductRequest extends FormRequest
                     'pack',
                     'meter',
                 ]),
-            ],
-
-            'brand_id' => [
-                'nullable',
-                'integer',
-                'exists:brands,id',
             ],
         ];
     }

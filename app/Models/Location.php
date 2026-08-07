@@ -23,8 +23,11 @@ class Location extends Model
 
     public function assignments(): HasMany
     {
-    return $this->hasMany(
-        LocationAssignment::class
-    );
+    return $this->hasMany(LocationAssignment::class);
+    }
+
+    public function productPrices(): HasMany
+    {
+    return $this->hasMany(ProductPrice::class);
     }
 }

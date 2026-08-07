@@ -20,11 +20,7 @@ return new class extends Migration
 
     $table->string('name');
 
-    // Internal company product code
-    $table->string('sku')->unique();
-
-    // Manufacturer barcode
-    $table->string('barcode')
+    $table->string('reference')
         ->nullable()
         ->unique();
 
@@ -34,18 +30,6 @@ return new class extends Migration
         ->nullOnDelete();
 
     $table->text('description')->nullable();
-
-    $table->decimal(
-        'purchase_price',
-        12,
-        2
-    );
-
-    $table->decimal(
-        'sale_price',
-        12,
-        2
-    );
 
     $table->string('unit')
         ->default('piece');

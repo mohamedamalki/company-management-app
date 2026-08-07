@@ -22,15 +22,9 @@ class StoreProductRequest extends FormRequest
             );
         }
 
-        if ($this->has('sku')) {
-            $data['sku'] = strtoupper(
-                trim($this->input('sku'))
-            );
-        }
-
-        if ($this->has('barcode')) {
-            $data['barcode'] = $this->filled('barcode')
-                ? trim($this->input('barcode'))
+        if ($this->has('reference')) {
+            $data['reference'] = $this->filled('reference')
+                ? strtoupper(trim($this->input('reference')))
                 : null;
         }
 
@@ -38,6 +32,12 @@ class StoreProductRequest extends FormRequest
             $data['unit'] = strtolower(
                 trim($this->input('unit'))
             );
+        }
+
+        if ($this->has('description')) {
+            $data['description'] = $this->filled('description')
+                ? trim($this->input('description'))
+                : null;
         }
 
         $this->merge($data);
@@ -52,41 +52,28 @@ class StoreProductRequest extends FormRequest
                 'exists:categories,id',
             ],
 
+            'brand_id' => [
+                'nullable',
+                'integer',
+                'exists:brands,id',
+            ],
+
             'name' => [
                 'required',
                 'string',
                 'max:255',
             ],
 
-            'sku' => [
-                'required',
-                'string',
-                'max:100',
-                'unique:products,sku',
-            ],
-
-            'barcode' => [
+            'reference' => [
                 'nullable',
                 'string',
                 'max:100',
-                'unique:products,barcode',
+                'unique:products,reference',
             ],
 
             'description' => [
                 'nullable',
                 'string',
-            ],
-
-            'purchase_price' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
-
-            'sale_price' => [
-                'required',
-                'numeric',
-                'min:0',
             ],
 
             'unit' => [
@@ -99,12 +86,6 @@ class StoreProductRequest extends FormRequest
                     'pack',
                     'meter',
                 ]),
-            ],
-
-            'brand_id' => [
-                'nullable',
-                'integer',
-                'exists:brands,id',
             ],
         ];
     }

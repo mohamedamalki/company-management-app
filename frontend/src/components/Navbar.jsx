@@ -72,115 +72,107 @@ export default function Navbar({ user, onMenuClick }) {
     };
 
     return (
-        <header className="sticky top-0 z-30 h-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <header className="sticky top-0 z-30 h-20 border-b border-slate-200/80 bg-white/80 shadow-sm shadow-slate-900/[0.02] backdrop-blur-md">
             <div className="flex h-full items-center gap-4 px-4 sm:px-6 lg:px-8">
                 <button
                     type="button"
                     onClick={onMenuClick}
                     aria-label="Open navigation"
-                    className="rounded-xl border border-slate-200 p-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-100 lg:hidden"
+                    className="rounded-xl border border-slate-200 p-2.5 text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 lg:hidden"
                 >
                     <Menu className="h-5 w-5" />
                 </button>
-
-                <div className="relative hidden w-full max-w-[430px] sm:block">
-                    <Search
-                        aria-hidden="true"
-                        className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
-                    />
-                    <input
-                        ref={searchInputRef}
-                        type="search"
-                        placeholder="Search products, depots, suppliers..."
-                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-12 pr-16 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                    />
-                    <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-slate-500 md:block">
-                        ⌘ K
-                    </span>
-                </div>
 
                 <div className="ml-auto flex items-center gap-2 sm:gap-3">
                     <button
                         type="button"
                         aria-label="Search"
                         onClick={() => searchInputRef.current?.focus()}
-                        className="rounded-xl border border-slate-200 p-2.5 text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 sm:hidden"
+                        className="rounded-xl border border-slate-200 p-2.5 text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95 sm:hidden"
                     >
                         <Search className="h-5 w-5" />
                     </button>
+
+                    <div className="hidden h-8 w-px bg-slate-200 sm:block" />
 
                     <div ref={profileMenuRef} className="relative">
                         <button
                             type="button"
                             onClick={() => setProfileOpen((open) => !open)}
                             aria-expanded={profileOpen}
-                            className="flex items-center gap-2 rounded-xl p-1.5 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 sm:gap-3"
+                            className={`flex items-center gap-2 rounded-xl p-1.5 transition focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 sm:gap-3 ${
+                                profileOpen ? "bg-slate-50" : "hover:bg-slate-50"
+                            }`}
                         >
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-extrabold text-blue-700">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-extrabold text-blue-700 ring-2 ring-white">
                                 {getInitials(userName)}
                             </span>
 
                             <span className="hidden text-left md:block">
-                                <span className="block max-w-40 truncate text-sm font-bold text-slate-800">
+                                <span className="block max-w-40 truncate text-sm font-bold leading-tight text-slate-800">
                                     {userName}
                                 </span>
-                                <span className="block text-[11px] font-semibold text-slate-400">
+                                <span className="block text-[11px] font-semibold leading-tight text-slate-400">
                                     Administrator
                                 </span>
                             </span>
 
                             <ChevronDown
-                                className={`hidden h-4 w-4 text-slate-500 transition-transform sm:block ${
+                                className={`hidden h-4 w-4 text-slate-400 transition-transform duration-200 sm:block ${
                                     profileOpen ? "rotate-180" : ""
                                 }`}
                             />
                         </button>
 
-                        {profileOpen && (
-                            <div className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10">
-                                <div className="border-b border-slate-100 px-3 py-3">
-                                    <p className="truncate text-sm font-bold text-slate-900">
-                                        {userName}
-                                    </p>
-                                    <p className="mt-1 truncate text-xs text-slate-500">
-                                        {userEmail}
-                                    </p>
-                                </div>
-
-                                <div className="py-2">
-                                    <DropdownButton
-                                        icon={UserRound}
-                                        label="My profile"
-                                        onClick={() => {
-                                            setProfileOpen(false);
-                                            navigate("/admin/profile");
-                                        }}
-                                    />
-                                    <DropdownButton
-                                        icon={Settings}
-                                        label="Settings"
-                                        onClick={() => {
-                                            setProfileOpen(false);
-                                            navigate("/admin/settings");
-                                        }}
-                                    />
-                                </div>
-
-                                <div className="border-t border-slate-100 pt-2">
-                                    <DropdownButton
-                                        icon={LogOut}
-                                        label={
-                                            loggingOut
-                                                ? "Signing out..."
-                                                : "Sign out"
-                                        }
-                                        onClick={handleLogout}
-                                        disabled={loggingOut}
-                                        danger
-                                    />
-                                </div>
+                        <div
+                            className={`absolute right-0 z-40 mt-2 w-64 origin-top-right overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10 transition-all duration-150 ${
+                                profileOpen
+                                    ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+                                    : "pointer-events-none -translate-y-1 scale-95 opacity-0"
+                            }`}
+                        >
+                            <div className="border-b border-slate-100 px-3 py-3">
+                                <p className="truncate text-sm font-bold text-slate-900">
+                                    {userName}
+                                </p>
+                                <p className="mt-0.5 truncate text-xs text-slate-500">
+                                    {userEmail}
+                                </p>
                             </div>
-                        )}
+
+                            <div className="py-1.5">
+                                <DropdownButton
+                                    icon={UserRound}
+                                    label="My profile"
+                                    onClick={() => {
+                                        setProfileOpen(false);
+                                        navigate("/admin/profile");
+                                    }}
+                                />
+                                <DropdownButton
+                                    icon={Settings}
+                                    label="Settings"
+                                    onClick={() => {
+                                        setProfileOpen(false);
+                                        navigate("/admin/settings");
+                                    }}
+                                />
+                            </div>
+
+                            <div className="border-t border-slate-100 pt-1.5">
+                                <DropdownButton
+                                    icon={LogOut}
+                                    label={
+                                        loggingOut
+                                            ? "Signing out..."
+                                            : "Sign out"
+                                    }
+                                    onClick={handleLogout}
+                                    disabled={loggingOut}
+                                    danger
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

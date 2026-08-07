@@ -1,4 +1,4 @@
-import {Routes,Route, Navigate} from 'react-router-dom'
+import {Routes,Route} from 'react-router-dom'
 import Login from './pages/auth/Login'
 import AdminDashboard from './pages/dashboard/AdminDashboard'
 import DashboardLayout from './layouts/DashboardLayout'
@@ -23,6 +23,21 @@ import LocationAssignmentsPage from './pages/locationAssignments/LocationAssignm
 import PaymentMethodsPage from './pages/paymentMethods/PaymentMethodsPage'
 import PaymentMethodsCreate from './pages/paymentMethods/PaymentMethodsCreate'
 import PaymentMethodsUpdate from './pages/paymentMethods/PaymentMethodsUpdate'
+import TaxRatesPage from './pages/taxRates/TaxRatesPage'
+import TaxRatesCreate from './pages/taxRates/TaxRatesCreate'
+import TaxRatesUpdate from './pages/taxRates/TaxRatesUpdate'
+import ProductPricesPage from './pages/productPrices/ProductPricesPage'
+import ProductPricesCreate from './pages/productPrices/ProductPricesCreate'
+import ProductPricesUpdate from './pages/productPrices/ProductPricesUpdate'
+import SuppliersPage from './pages/suppliers/SuppliersPage'
+import SuppliersCreate from './pages/suppliers/SuppliersCreate'
+import SuppliersUpdate from './pages/suppliers/SuppliersUpdate'
+import PurchaseOrdersPage from './pages/purchaseOrders/PurchaseOrdersPage'
+import PurchaseOrdersCreate from './pages/purchaseOrders/PurchaseOrdersCreate'
+import PurchaseOrdersUpdate from './pages/purchaseOrders/PurchaseOrdersUpdate'
+import PurchaseOrderDetails from './pages/purchaseOrders/PurchaseOrdersDetails'
+import Responsable from './pages/responsable/Responsable'
+import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
 
@@ -33,7 +48,7 @@ function App() {
             <Route element = {<GuestRoute/>}>
             <Route path='/login' element={<Login/>}/>
             </Route>
-            <Route element = {<ProtectedRoute/>}>
+            <Route element = {<ProtectedRoute allowedRoles={["admin"]} />}  >
             <Route path="/admin" element={<DashboardLayout />}>
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="users" element={<UsersPage />} />
@@ -59,13 +74,31 @@ function App() {
                 <Route path="location-assignments" element={<LocationAssignmentsPage />}/>
 
                 <Route path="payment-methods" element={<PaymentMethodsPage />}/>
-
                 <Route path="payment-methods/create" element={<PaymentMethodsCreate />}/>
-
                 <Route path="payment-methods/:id/edit" element={<PaymentMethodsUpdate />}/>
+
+                <Route path="tax-rates" element={<TaxRatesPage />} />
+                <Route path="tax-rates/create" element={<TaxRatesCreate />} />
+                <Route path="tax-rates/:id/edit" element={<TaxRatesUpdate />} />
+
+                <Route path="product-prices" element={<ProductPricesPage />}/>
+                <Route path="product-prices/create" element={<ProductPricesCreate />}/>
+                <Route path="product-prices/:id/edit" element={<ProductPricesUpdate />}/>
+
+                <Route path="suppliers" element={<SuppliersPage />} />
+                <Route path="suppliers/create" element={<SuppliersCreate />} />
+                <Route path="suppliers/:id/edit" element={<SuppliersUpdate />} />
+
+                <Route path="purchase-orders" element={<PurchaseOrdersPage />} />
+                <Route path="purchase-orders/create" element={<PurchaseOrdersCreate />}/>
+                <Route path="purchase-orders/:id" element={<PurchaseOrderDetails />}/>
+                <Route path="purchase-orders/:id/edit" element={<PurchaseOrdersUpdate />}/>
             </Route>
             </Route>
-            <Route path="*" element={<Navigate to="/login" replace />}/>
+            <Route element={<ProtectedRoute allowedRoles={["responsable"]}/>}>
+            <Route path="/responsable/dashboard" element={<Responsable />}/>
+            </Route>
+            <Route path="*" element={<NotFoundPage/>}/>
         </Routes>
     </div>
   )

@@ -11,39 +11,45 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(
-        Request $request
-    ): JsonResponse {
+    /**
+     * Return the products list.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $perPage = min(
+            max((int) $request->input('per_page', 15), 1),
+            100
+        );
+
         $products = Product::query()
             ->with([
                 'category:id,name',
                 'brand:id,name',
+                'currentGlobalPrice.taxRate:id,name,code,rate',
             ])
+
             ->when(
                 $request->filled('category_id'),
                 fn ($query) => $query->where(
                     'category_id',
-                    $request->category_id
+                    $request->input('category_id')
                 )
             )
+
             ->when(
                 $request->filled('brand_id'),
                 fn ($query) => $query->where(
                     'brand_id',
-                    $request->brand_id
+                    $request->input('brand_id')
                 )
             )
-            ->when(
-                $request->filled('unit'),
-                fn ($query) => $query->where(
-                    'unit',
-                    $request->unit
-                )
-            )
+
             ->when(
                 $request->filled('search'),
                 function ($query) use ($request) {
-                    $search = $request->search;
+                    $search = trim(
+                        $request->input('search')
+                    );
 
                     $query->where(
                         function ($query) use ($search) {
@@ -54,12 +60,7 @@ class ProductController extends Controller
                                     "%{$search}%"
                                 )
                                 ->orWhere(
-                                    'sku',
-                                    'like',
-                                    "%{$search}%"
-                                )
-                                ->orWhere(
-                                    'barcode',
+                                    'reference',
                                     'like',
                                     "%{$search}%"
                                 );
@@ -67,12 +68,16 @@ class ProductController extends Controller
                     );
                 }
             )
+
             ->latest()
-            ->paginate(15);
+            ->paginate($perPage);
 
         return response()->json($products);
     }
 
+    /**
+     * Create a product.
+     */
     public function store(
         StoreProductRequest $request
     ): JsonResponse {
@@ -81,8 +86,7 @@ class ProductController extends Controller
         );
 
         return response()->json([
-            'message' =>
-                'Product created successfully.',
+            'message' => 'Product created successfully.',
 
             'data' => $product->load([
                 'category:id,name',
@@ -91,6 +95,9 @@ class ProductController extends Controller
         ], 201);
     }
 
+    /**
+     * Return one product.
+     */
     public function show(
         Product $product
     ): JsonResponse {
@@ -102,6 +109,9 @@ class ProductController extends Controller
         ]);
     }
 
+    /**
+     * Update a product.
+     */
     public function update(
         UpdateProductRequest $request,
         Product $product
@@ -111,8 +121,7 @@ class ProductController extends Controller
         );
 
         return response()->json([
-            'message' =>
-                'Product updated successfully.',
+            'message' => 'Product updated successfully.',
 
             'data' => $product
                 ->fresh()
@@ -121,5 +130,14 @@ class ProductController extends Controller
                     'brand:id,name',
                 ]),
         ]);
+    }
+
+    public function destroy(Product $product): JsonResponse
+    {
+    $product->delete();
+
+    return response()->json([
+        'message' => 'Product deleted successfully.',
+    ]);
     }
 }
