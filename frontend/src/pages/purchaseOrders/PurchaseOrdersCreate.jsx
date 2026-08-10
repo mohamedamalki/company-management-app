@@ -16,7 +16,7 @@ function PurchaseOrdersCreate() {
       const response = await api.post("/purchase-orders", formData);
       const order = response.data.data ?? response.data;
 
-      navigate(`/admin/purchase-orders/${order.id}`, {
+      navigate(`/app/purchase-orders/${order.id}`, {
         replace: true,
         state: { message: "Purchase order created successfully." },
       });

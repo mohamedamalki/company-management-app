@@ -147,7 +147,7 @@ function BrandForm({
             {/* Actions */}
             <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50/80 px-6 py-4 sm:flex-row sm:justify-end">
                 <Link
-                    to="/admin/brands"
+                    to="/app/brands"
                     className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                 >
                     Cancel

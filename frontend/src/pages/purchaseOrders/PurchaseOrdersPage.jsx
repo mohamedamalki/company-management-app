@@ -247,7 +247,7 @@ function PurchaseOrdersPage() {
           </select>
 
           <Link
-            to="/admin/purchase-orders/create"
+            to="/app/purchase-orders/create"
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
           >
             <Plus size={18} /> Create order
@@ -328,7 +328,7 @@ function PurchaseOrdersPage() {
                     <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">
                         <Link
-                          to={`/admin/purchase-orders/${order.id}`}
+                          to={`/app/purchase-orders/${order.id}`}
                           title="View order"
                           className="rounded-lg bg-slate-100 p-2 text-slate-700 hover:bg-slate-200"
                         >
@@ -338,7 +338,7 @@ function PurchaseOrdersPage() {
 {order.status === "draft" && (
     <>
         <Link
-            to={`/admin/purchase-orders/${order.id}/edit`}
+            to={`/app/purchase-orders/${order.id}/edit`}
             title="Edit order"
             className="rounded-lg bg-blue-50 p-2 text-blue-700 hover:bg-blue-100"
         >

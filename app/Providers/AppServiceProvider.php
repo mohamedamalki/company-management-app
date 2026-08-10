@@ -2,12 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\Location;
+use App\Policies\LocationPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Register application services.
      */
     public function register(): void
     {
@@ -15,10 +18,13 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap application services.
      */
     public function boot(): void
     {
-        //
+        Gate::policy(
+            Location::class,
+            LocationPolicy::class
+        );
     }
 }

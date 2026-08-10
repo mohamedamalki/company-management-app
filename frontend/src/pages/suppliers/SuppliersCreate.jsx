@@ -21,7 +21,7 @@ function SuppliersCreate() {
       setError("");
 
       await api.post("/suppliers", formData);
-      navigate("/admin/suppliers", {
+      navigate("/app/suppliers", {
         replace: true,
         state: { message: "Supplier created successfully." },
       });

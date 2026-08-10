@@ -24,7 +24,7 @@ function BrandsCreate() {
                 formData
             );
 
-            navigate("/admin/brands", {
+            navigate("/app/brands", {
                 replace: true,
             });
         } catch (error) {

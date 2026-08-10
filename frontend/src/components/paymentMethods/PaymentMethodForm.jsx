@@ -172,7 +172,7 @@ function PaymentMethodForm({
 
         <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
           <Link
-            to="/admin/payment-methods"
+            to="/app/payment-methods"
             className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
           >
             Cancel

@@ -82,7 +82,7 @@ function BrandsUpdate() {
                 formData
             );
 
-            navigate("/admin/brands", {
+            navigate("/app/brands", {
                 replace: true,
             });
         } catch (error) {

@@ -139,7 +139,7 @@ function PurchaseOrderDetails() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <Link
-            to="/admin/purchase-orders"
+            to="/app/purchase-orders"
             className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900"
           >
             <ArrowLeft size={17} /> Purchase orders
@@ -159,7 +159,7 @@ function PurchaseOrderDetails() {
         <div className="flex flex-wrap gap-2">
           {order.status === "draft" && (
             <Link
-              to={`/admin/purchase-orders/${order.id}/edit`}
+              to={`/app/purchase-orders/${order.id}/edit`}
               className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-700 hover:bg-blue-100"
             >
               <FilePenLine size={17} /> Edit

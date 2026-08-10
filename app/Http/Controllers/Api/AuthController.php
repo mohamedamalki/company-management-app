@@ -57,8 +57,8 @@ class AuthController extends Controller
     /**
      * Return the authenticated user.
      */
-    public function me(Request $request): JsonResponse
-    {
+public function me(Request $request): JsonResponse
+{
     $user = $request->user();
 
     if ($user->status !== 'active') {
@@ -67,6 +67,17 @@ class AuthController extends Controller
         ], 403);
     }
 
+    $locations = $user
+        ->assignedLocations()
+        ->select([
+            'locations.id',
+            'locations.name',
+            'locations.code',
+            'locations.type',
+            'locations.status',
+        ])
+        ->get();
+
     return response()->json([
         'data' => [
             'id' => $user->id,
@@ -74,9 +85,17 @@ class AuthController extends Controller
             'email' => $user->email,
             'role' => $user->role,
             'status' => $user->status,
+
+            'permissions' => $user
+                ->getAllPermissions()
+                ->pluck('name')
+                ->sort()
+                ->values(),
+
+            'locations' => $locations,
         ],
     ]);
-    }
+}
 
     /**
      * Delete the current API token.

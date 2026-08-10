@@ -6,21 +6,21 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected string $guard_name = 'web';
+
     protected $fillable = [
         'name',
         'email',
@@ -63,4 +63,19 @@ class User extends Authenticatable
         LocationAssignment::class
     );
     }
+
+    public function stockMovements(): HasMany
+{
+    return $this->hasMany(StockMovement::class);
+}
+
+    public function assignedLocations(): BelongsToMany
+{
+    return $this->belongsToMany(
+        Location::class,
+        'location_assignments',
+        'user_id',
+        'location_id'
+    )->withTimestamps();
+}
 }

@@ -8,9 +8,33 @@ use App\Http\Requests\UpdateSupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class SupplierController extends Controller
+class SupplierController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+{
+    return [
+        new Middleware(
+            'can:suppliers.view',
+            only: [
+                'index',
+                'show',
+                'active',
+            ]
+        ),
+
+        new Middleware(
+            'can:suppliers.manage',
+            only: [
+                'store',
+                'update',
+                'destroy',
+            ]
+        ),
+    ];
+}
     public function index(
         Request $request
     ): JsonResponse {

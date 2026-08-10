@@ -5,12 +5,38 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class ProductController extends Controller
+class ProductController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(
+                'can:products.view',
+                only: [
+                    'index',
+                    'show',
+                    'filterOptions'
+                ]
+            ),
+
+            new Middleware(
+                'can:products.manage',
+                only: [
+                    'store',
+                    'update',
+                    'destroy',
+                ]
+            ),
+        ];
+    }
     /**
      * Return the products list.
      */
@@ -140,4 +166,27 @@ class ProductController extends Controller
         'message' => 'Product deleted successfully.',
     ]);
     }
+
+    public function filterOptions(): JsonResponse
+{
+    return response()->json([
+        'data' => [
+            'categories' => Category::query()
+                ->select([
+                    'id',
+                    'name',
+                ])
+                ->orderBy('name')
+                ->get(),
+
+            'brands' => Brand::query()
+                ->select([
+                    'id',
+                    'name',
+                ])
+                ->orderBy('name')
+                ->get(),
+        ],
+    ]);
+}
 }

@@ -67,7 +67,7 @@ function CategoriesPage() {
                     </div>
 
                     <Link
-                        to="/admin/categories/create"
+                        to="/app/categories/create"
                         className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
                     >
                         <span className="text-lg">+</span>
@@ -169,7 +169,7 @@ function CategoriesPage() {
 
                                             <td className="px-5 py-3.5 text-right">
                                                 <Link
-                                                    to={`/admin/categories/${category.id}/edit`}
+                                                    to={`/app/categories/${category.id}/edit`}
                                                     className="rounded-md px-2.5 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50"
                                                 >
                                                     Edit

@@ -10,9 +10,33 @@ use App\Models\ProductPrice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ProductPriceController extends Controller
+class ProductPriceController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+{
+    return [
+        new Middleware(
+            'can:product-prices.view',
+            only: [
+                'index',
+                'show',
+                'current',
+                'catalogue',
+            ]
+        ),
+
+        new Middleware(
+            'can:product-prices.manage',
+            only: [
+                'store',
+                'update',
+            ]
+        ),
+    ];
+}
     public function index(Request $request): JsonResponse
     {
         $perPage = min(

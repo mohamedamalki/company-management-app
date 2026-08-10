@@ -12,9 +12,42 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PurchaseOrderController extends Controller
+class PurchaseOrderController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+{
+    return [
+        new Middleware(
+            'can:purchase-orders.view',
+            only: [
+                'index',
+                'show',
+                'pdf',
+            ]
+        ),
+
+        new Middleware(
+            'can:purchase-orders.manage',
+            only: [
+                'store',
+                'update',
+            ]
+        ),
+
+        new Middleware(
+            'can:purchase-orders.confirm',
+            only: ['confirm']
+        ),
+
+        new Middleware(
+            'can:purchase-orders.cancel',
+            only: ['cancel']
+        ),
+    ];
+}
     public function index(
         Request $request
     ): JsonResponse {

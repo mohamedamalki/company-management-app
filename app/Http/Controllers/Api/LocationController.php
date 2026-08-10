@@ -8,9 +8,25 @@ use App\Http\Requests\UpdateLocationRequest;
 use App\Models\Location;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class LocationController extends Controller
+class LocationController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+{
+    return [
+        new Middleware(
+            'can:locations.view',
+            only: ['index', 'show']
+        ),
+
+        new Middleware(
+            'can:locations.manage',
+            only: ['store', 'update']
+        ),
+    ];
+}
     /**
      * Return a paginated list of locations.
      */

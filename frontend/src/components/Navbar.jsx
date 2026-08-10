@@ -146,7 +146,7 @@ export default function Navbar({ user, onMenuClick }) {
                                     label="My profile"
                                     onClick={() => {
                                         setProfileOpen(false);
-                                        navigate("/admin/profile");
+                                        navigate("/app/profile");
                                     }}
                                 />
                                 <DropdownButton
@@ -154,7 +154,7 @@ export default function Navbar({ user, onMenuClick }) {
                                     label="Settings"
                                     onClick={() => {
                                         setProfileOpen(false);
-                                        navigate("/admin/settings");
+                                        navigate("/app/settings");
                                     }}
                                 />
                             </div>

@@ -8,9 +8,32 @@ use App\Http\Requests\UpdateTaxRateRequest;
 use App\Models\TaxRate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class TaxRateController extends Controller
+class TaxRateController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+{
+    return [
+        new Middleware(
+            'can:tax-rates.view',
+            only: [
+                'index',
+                'show',
+                'active',
+            ]
+        ),
+
+        new Middleware(
+            'can:tax-rates.manage',
+            only: [
+                'store',
+                'update',
+            ]
+        ),
+    ];
+}
     public function index(Request $request): JsonResponse
     {
         $perPage = min(

@@ -8,9 +8,32 @@ use App\Http\Requests\UpdatePaymentMethodRequest;
 use App\Models\PaymentMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PaymentMethodController extends Controller
+class PaymentMethodController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+{
+    return [
+        new Middleware(
+            'can:payment-methods.view',
+            only: [
+                'index',
+                'show',
+                'active',
+            ]
+        ),
+
+        new Middleware(
+            'can:payment-methods.manage',
+            only: [
+                'store',
+                'update',
+            ]
+        ),
+    ];
+}
     /**
      * Admin list: includes active and inactive methods.
      */

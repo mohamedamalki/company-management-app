@@ -23,7 +23,7 @@ function ProductsCreate() {
 
       await api.post("/products", formData);
 
-      navigate("/admin/products", {
+      navigate("/app/products", {
         replace: true,
       });
     } catch (requestError) {

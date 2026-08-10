@@ -45,4 +45,14 @@ class Product extends Model
         ->where('status', 'active')
         ->latestOfMany('starts_at');
     }
+
+    public function locationStocks(): HasMany
+{
+    return $this->hasMany(LocationStock::class);
+}
+
+public function stockMovements(): HasMany
+{
+    return $this->hasMany(StockMovement::class);
+}
 }

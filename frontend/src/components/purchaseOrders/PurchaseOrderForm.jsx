@@ -498,7 +498,7 @@ function PurchaseOrderForm({
 
       <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-5">
         <Link
-          to="/admin/purchase-orders"
+          to="/app/purchase-orders"
           className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100"
         >
           Cancel

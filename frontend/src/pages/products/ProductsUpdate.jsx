@@ -60,7 +60,7 @@ function ProductsUpdate() {
 
       await api.put(`/products/${id}`, formData);
 
-      navigate("/admin/products", {
+      navigate("/app/products", {
         replace: true,
       });
     } catch (requestError) {

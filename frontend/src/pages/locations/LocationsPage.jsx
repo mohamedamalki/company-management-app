@@ -160,7 +160,7 @@ function LocationsPage() {
           </div>
 
           <Link
-            to="/admin/locations/create"
+            to="/app/locations/create"
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
           >
             <Plus size={17} />
@@ -295,7 +295,7 @@ function LocationsPage() {
                       <td className="px-5 py-4">
                         <div className="flex justify-end gap-2">
                           <Link
-                            to={`/admin/locations/${location.id}/edit`}
+                            to={`/app/locations/${location.id}/edit`}
                             className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
                           >
                             Edit

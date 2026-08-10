@@ -62,7 +62,7 @@ function ProductPricesUpdate() {
 
       await api.patch(`/product-prices/${id}`, formData);
 
-      navigate("/admin/product-prices", {
+      navigate("/app/product-prices", {
         replace: true,
         state: {
           success: "Product price updated successfully.",

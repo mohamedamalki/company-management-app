@@ -132,7 +132,7 @@ function UsersPage() {
                     </div>
 
                     <Link
-                        to="/admin/users/create"
+                        to="/app/users/create"
                         className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                     >
                         <svg
@@ -308,7 +308,7 @@ function UsersPage() {
                                             <td className="px-5 py-3.5">
                                                 <div className="flex justify-end gap-2">
                                                     <Link
-                                                        to={`/admin/users/${user.id}/edit`}
+                                                        to={`/app/users/${user.id}/edit`}
                                                         className="rounded-md px-2.5 py-1.5 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50"
                                                     >
                                                         Edit

@@ -8,9 +8,25 @@ use App\Http\Requests\UpdateBrandRequest;
 use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class BrandController extends Controller
+class BrandController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+{
+    return [
+        new Middleware(
+            'can:brands.view',
+            only: ['index', 'show']
+        ),
+
+        new Middleware(
+            'can:brands.manage',
+            only: ['store', 'update']
+        ),
+    ];
+}
     public function index(
         Request $request
     ): JsonResponse {

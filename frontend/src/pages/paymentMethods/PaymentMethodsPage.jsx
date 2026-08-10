@@ -209,7 +209,7 @@ function PaymentMethodsPage() {
           </div>
 
           <Link
-            to="/admin/payment-methods/create"
+            to="/app/payment-methods/create"
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
           >
             <Plus size={18} />
@@ -358,7 +358,7 @@ function PaymentMethodsPage() {
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-2">
                           <Link
-                            to={`/admin/payment-methods/${paymentMethod.id}/edit`}
+                            to={`/app/payment-methods/${paymentMethod.id}/edit`}
                             className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
                           >
                             <Pencil size={14} />

@@ -61,7 +61,7 @@ function UsersUpdate() {
 
             await api.put(`/users/${id}`, payload);
 
-            navigate("/admin/users");
+            navigate("/app/users");
         } catch (error) {
             const validationErrors =
                 error.response?.data?.errors;

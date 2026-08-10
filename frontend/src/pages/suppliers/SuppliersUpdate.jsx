@@ -40,7 +40,7 @@ function SuppliersUpdate() {
       setError("");
 
       await api.put(`/suppliers/${id}`, formData);
-      navigate("/admin/suppliers", {
+      navigate("/app/suppliers", {
         replace: true,
         state: { message: "Supplier updated successfully." },
       });

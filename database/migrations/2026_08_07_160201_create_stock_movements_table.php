@@ -13,7 +13,37 @@ return new class extends Migration
     {
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('location_id')
+                ->constrained('locations')
+                ->restrictOnDelete();
+
+            $table->foreignId('product_id')
+                ->constrained('products')
+                ->restrictOnDelete();
+
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            $table->string('type', 50)
+                ->index();
+
+            $table->decimal('quantity', 15, 3);
+            $table->decimal('quantity_before', 15, 3);
+            $table->decimal('quantity_after', 15, 3);
+
+            $table->nullableMorphs('reference');
+
+            $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index([
+                'location_id',
+                'product_id',
+                'created_at',
+            ], 'stock_movements_location_product_date_index');
         });
     }
 

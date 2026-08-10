@@ -40,7 +40,7 @@ function PurchaseOrdersUpdate() {
       setError("");
 
       await api.put(`/purchase-orders/${id}`, formData);
-      navigate(`/admin/purchase-orders/${id}`, {
+      navigate(`/app/purchase-orders/${id}`, {
         replace: true,
         state: { message: "Purchase order updated successfully." },
       });

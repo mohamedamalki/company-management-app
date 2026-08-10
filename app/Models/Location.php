@@ -30,4 +30,14 @@ class Location extends Model
     {
     return $this->hasMany(ProductPrice::class);
     }
+
+    public function stocks(): HasMany
+{
+    return $this->hasMany(LocationStock::class);
+}
+
+public function stockMovements(): HasMany
+{
+    return $this->hasMany(StockMovement::class);
+}
 }

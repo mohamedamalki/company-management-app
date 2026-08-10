@@ -29,7 +29,7 @@ function PaymentMethodsCreate() {
 
       const response = await api.post("/payment-methods", formData);
 
-      navigate("/admin/payment-methods", {
+      navigate("/app/payment-methods", {
         replace: true,
         state: {
           success:
@@ -48,7 +48,7 @@ function PaymentMethodsCreate() {
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
           <Link
-            to="/admin/payment-methods"
+            to="/app/payment-methods"
             className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-blue-600"
           >
             <ArrowLeft size={16} />

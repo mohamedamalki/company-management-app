@@ -2,7 +2,7 @@ import { ArrowLeft, Home, MapPinOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const dashboardByRole = {
-    admin: "/admin/dashboard",
+    admin: "/app/dashboard",
     responsable: "/responsable/dashboard",
     fournisseur: "/fournisseur/dashboard",
 };

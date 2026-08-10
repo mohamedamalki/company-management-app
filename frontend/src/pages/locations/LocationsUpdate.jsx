@@ -78,7 +78,7 @@ function LocationsUpdate() {
                 formData
             );
 
-            navigate("/admin/locations", {
+            navigate("/app/locations", {
                 replace: true,
             });
         } catch (error) {

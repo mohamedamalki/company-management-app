@@ -12,20 +12,6 @@ const initialForm = {
   unit: "piece",
 };
 
-const getItems = (response) => {
-  const body = response.data;
-
-  if (Array.isArray(body?.data)) {
-    return body.data;
-  }
-
-  if (Array.isArray(body?.data?.data)) {
-    return body.data.data;
-  }
-
-  return Array.isArray(body) ? body : [];
-};
-
 function ProductForm({
   initialData = initialForm,
   onSubmit,
@@ -55,18 +41,14 @@ function ProductForm({
 
     const loadOptions = async () => {
       try {
-        const [categoriesResponse, brandsResponse] = await Promise.all([
-          api.get("/categories", {
-            params: { per_page: 100 },
-          }),
-          api.get("/brands", {
-            params: { per_page: 100 },
-          }),
-        ]);
+        const response = await api.get("/products/filter-options");
+
+        const data = response.data.data ?? response.data;
 
         if (!cancelled) {
-          setCategories(getItems(categoriesResponse));
-          setBrands(getItems(brandsResponse));
+          setCategories(Array.isArray(data?.categories) ? data.categories : []);
+
+          setBrands(Array.isArray(data?.brands) ? data.brands : []);
         }
       } catch (requestError) {
         console.error("Unable to load product options:", requestError);
@@ -318,7 +300,7 @@ function ProductForm({
 
       <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50/80 px-6 py-4 sm:flex-row sm:justify-end">
         <Link
-          to="/admin/products"
+          to="/app/products"
           className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-100"
         >
           Cancel

@@ -16,7 +16,7 @@ function UsersCreate() {
 
             await api.post("/users", formData);
 
-            navigate("/admin/users");
+            navigate("/app/users");
         } catch (error) {
             const validationErrors =
                 error.response?.data?.errors;

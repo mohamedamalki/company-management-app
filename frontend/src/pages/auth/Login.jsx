@@ -18,21 +18,15 @@ const initialForm = {
     password: "",
 };
 
-const dashboardByRole = {
-    admin: "/admin/dashboard",
-    responsable: "/responsable/dashboard",
-    fournisseur: "/fournisseur/dashboard",
-};
-
 function getApiError(error) {
     const response = error.response?.data;
 
     if (response?.errors) {
-        const firstValidationError =
+        const firstError =
             Object.values(response.errors).flat()[0];
 
-        if (firstValidationError) {
-            return firstValidationError;
+        if (firstError) {
+            return firstError;
         }
     }
 
@@ -47,17 +41,26 @@ export default function Login() {
     const navigate = useNavigate();
     const { saveAuthentication } = useAuth();
 
-    const [formData, setFormData] = useState(initialForm);
-    const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [formData, setFormData] =
+        useState(initialForm);
+
+    const [showPassword, setShowPassword] =
+        useState(false);
+
+    const [rememberMe, setRememberMe] =
+        useState(false);
+
+    const [loading, setLoading] =
+        useState(false);
+
+    const [error, setError] =
+        useState("");
 
     const handleChange = (event) => {
         const { name, value } = event.target;
 
-        setFormData((previousData) => ({
-            ...previousData,
+        setFormData((currentForm) => ({
+            ...currentForm,
             [name]: value,
         }));
 
@@ -68,6 +71,7 @@ export default function Login() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
         setError("");
         setLoading(true);
 
@@ -89,27 +93,30 @@ export default function Login() {
                 );
             }
 
-            if (!user?.role) {
+            if (!user) {
                 throw new Error(
-                    "The API response does not contain the user role."
+                    "The API response does not contain the user."
                 );
             }
 
             const role = user.role
-                .trim()
+                ?.trim()
                 .toLowerCase();
 
-            const destination = dashboardByRole[role];
-
-            if (!destination) {
+            if (!role) {
                 throw new Error(
-                    `Unknown user role: ${role}`
+                    "The API response does not contain the user role."
                 );
             }
 
             const authenticatedUser = {
                 ...user,
                 role,
+                permissions: Array.isArray(
+                    user.permissions
+                )
+                    ? user.permissions
+                    : [],
             };
 
             saveAuthentication({
@@ -118,11 +125,13 @@ export default function Login() {
                 remember: rememberMe,
             });
 
-            navigate(destination, {
+            navigate("/app/dashboard", {
                 replace: true,
             });
         } catch (requestError) {
-            setError(getApiError(requestError));
+            setError(
+                getApiError(requestError)
+            );
         } finally {
             setLoading(false);
         }
@@ -132,8 +141,11 @@ export default function Login() {
         <main className="grid min-h-screen bg-slate-50 lg:grid-cols-[43%_57%]">
             <section className="relative hidden overflow-hidden bg-[#0b2555] px-10 py-10 text-white lg:flex lg:flex-col xl:px-16 xl:py-14">
                 <div className="pointer-events-none absolute -right-32 -top-40 h-[460px] w-[460px] rounded-full bg-blue-500/15 blur-[2px]" />
+
                 <div className="pointer-events-none absolute -bottom-48 -left-40 h-[500px] w-[500px] rounded-full bg-blue-500/20 blur-[2px]" />
+
                 <div className="pointer-events-none absolute bottom-24 right-8 h-48 w-48 rounded-full border border-blue-300/20 bg-blue-400/5" />
+
                 <div className="pointer-events-none absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
 
                 <div className="relative z-10 flex items-center gap-4">
@@ -149,16 +161,18 @@ export default function Login() {
 
                 <div className="relative z-10 my-auto max-w-lg">
                     <h1 className="text-5xl font-extrabold leading-[1.12] tracking-[-0.04em] xl:text-6xl">
-                        Run your company with <br />
+                        Run your company with
+                        <br />
+
                         <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
                             M-App.
                         </span>
                     </h1>
 
                     <p className="mt-6 max-w-md text-lg leading-8 text-blue-100/80">
-                        One secure workspace for teams,
-                        inventory, suppliers, sales, and daily
-                        operations.
+                        One secure workspace for
+                        teams, inventory, suppliers,
+                        sales, and daily operations.
                     </p>
 
                     <div className="mt-14 space-y-6">
@@ -166,10 +180,12 @@ export default function Login() {
                             icon={LineChart}
                             text="Live operational overview"
                         />
+
                         <Feature
                             icon={ShieldCheck}
-                            text="Role-based access and control"
+                            text="Permission-based access and control"
                         />
+
                         <Feature
                             icon={BarChart3}
                             text="Faster decisions with real-time data"
@@ -178,7 +194,8 @@ export default function Login() {
                 </div>
 
                 <p className="relative z-10 text-xs font-medium text-blue-200/50">
-                    © 2026 Management-App • Privacy • Security
+                    © 2026 Management-App • Privacy
+                    • Security
                 </p>
             </section>
 
@@ -199,9 +216,10 @@ export default function Login() {
                         <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
                             Welcome back
                         </h2>
+
                         <p className="mt-2 text-sm leading-6 text-slate-500">
-                            Sign in to continue to your company
-                            workspace.
+                            Sign in to continue to
+                            your company workspace.
                         </p>
                     </div>
 
@@ -211,6 +229,7 @@ export default function Login() {
                             className="mt-6 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
                         >
                             <span className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+
                             {error}
                         </div>
                     )}
@@ -253,8 +272,12 @@ export default function Login() {
                                             ? "text"
                                             : "password"
                                     }
-                                    value={formData.password}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.password
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     autoComplete="current-password"
                                     placeholder="Enter your password"
                                     required
@@ -265,7 +288,8 @@ export default function Login() {
                                     type="button"
                                     onClick={() =>
                                         setShowPassword(
-                                            (visible) => !visible
+                                            (current) =>
+                                                !current
                                         )
                                     }
                                     aria-label={
@@ -289,13 +313,17 @@ export default function Login() {
                                 <input
                                     type="checkbox"
                                     checked={rememberMe}
-                                    onChange={(event) =>
+                                    onChange={(
+                                        event
+                                    ) =>
                                         setRememberMe(
-                                            event.target.checked
+                                            event.target
+                                                .checked
                                         )
                                     }
                                     className="h-4 w-4 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                                 />
+
                                 Remember me
                             </label>
 
@@ -310,16 +338,20 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative flex h-14 w-full items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:from-blue-700 hover:to-blue-800 hover:shadow-xl hover:shadow-blue-600/25 focus:outline-none focus:ring-4 focus:ring-blue-200 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-65 disabled:active:scale-100"
+                            className="group relative flex h-14 w-full items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:from-blue-700 hover:to-blue-800 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-200 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-65"
                         >
                             {loading ? (
                                 <span className="flex items-center gap-3">
                                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+
                                     Signing in...
                                 </span>
                             ) : (
                                 <span className="flex w-full items-center justify-center">
-                                    <span>Sign in</span>
+                                    <span>
+                                        Sign in
+                                    </span>
+
                                     <ArrowRight className="absolute right-5 hidden h-5 w-5 transition-transform group-hover:translate-x-1 sm:block" />
                                 </span>
                             )}
@@ -328,14 +360,18 @@ export default function Login() {
                 </div>
 
                 <p className="absolute bottom-6 hidden text-xs text-slate-400 sm:block lg:hidden">
-                    © 2026 Management-App • Privacy • Security
+                    © 2026 Management-App • Privacy
+                    • Security
                 </p>
             </section>
         </main>
     );
 }
 
-function Feature({ icon: Icon, text }) {
+function Feature({
+    icon: Icon,
+    text,
+}) {
     return (
         <div className="flex items-center gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-blue-300/10 bg-blue-400/10 text-blue-300">
@@ -344,6 +380,7 @@ function Feature({ icon: Icon, text }) {
                     strokeWidth={1.8}
                 />
             </div>
+
             <p className="font-bold text-blue-50">
                 {text}
             </p>
@@ -351,7 +388,12 @@ function Feature({ icon: Icon, text }) {
     );
 }
 
-function FormField({ icon: Icon, label, id, ...inputProps }) {
+function FormField({
+    icon: Icon,
+    label,
+    id,
+    ...inputProps
+}) {
     return (
         <div>
             <label

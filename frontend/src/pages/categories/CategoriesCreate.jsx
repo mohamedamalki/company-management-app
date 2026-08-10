@@ -15,7 +15,7 @@ function CategoriesCreate() {
 
             await api.post("/categories", formData);
 
-            navigate("/admin/categories");
+            navigate("/app/categories");
         } catch (error) {
             const errors = error.response?.data?.errors;
 
