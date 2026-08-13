@@ -55,4 +55,11 @@ public function stockMovements(): HasMany
 {
     return $this->hasMany(StockMovement::class);
 }
+
+public function saleItems(): HasMany
+{
+    return $this->hasMany(
+        SaleItem::class
+    );
+}
 }

@@ -369,7 +369,7 @@ function UserPermissionsPage() {
                     ? data.assigned_permissions.filter(
                           (name) =>
                               allowedNames.includes(
-                                  name
+                                name
                               )
                       )
                     : [];

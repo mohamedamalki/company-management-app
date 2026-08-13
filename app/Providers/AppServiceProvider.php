@@ -2,29 +2,32 @@
 
 namespace App\Providers;
 
-use App\Models\Location;
-use App\Policies\LocationPolicy;
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap application services.
-     */
     public function boot(): void
     {
-        Gate::policy(
-            Location::class,
-            LocationPolicy::class
+        Gate::before(
+            function (
+                User $user,
+                string $ability
+            ): ?bool {
+                $role = strtolower(
+                    trim($user->role)
+                );
+
+                return $role === 'admin'
+                    ? true
+                    : null;
+            }
         );
     }
 }

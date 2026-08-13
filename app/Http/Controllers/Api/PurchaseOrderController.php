@@ -353,23 +353,51 @@ class PurchaseOrderController extends Controller implements HasMiddleware
         ]);
     }
 
-    public function confirm( PurchaseOrder $purchaseOrder ): JsonResponse {
+public function confirm(
+    PurchaseOrder $purchaseOrder
+): JsonResponse {
+    if ($purchaseOrder->status === 'ordered') {
+        return response()->json([
+            'message' =>
+                'Purchase order is already confirmed.',
+
+            'data' => $purchaseOrder->load([
+                'supplier',
+                'location',
+                'items.product',
+            ]),
+        ]);
+    }
+
     if ($purchaseOrder->status !== 'draft') {
         return response()->json([
             'message' =>
-                'Only draft orders can be confirmed.',
+                'Only draft purchase orders can be confirmed.',
         ], 422);
     }
 
-    $purchaseOrder->update([
-        'status' => 'ordered',
-    ]);
+    if (!$purchaseOrder->items()->exists()) {
+        return response()->json([
+            'message' =>
+                'A purchase order without products cannot be confirmed.',
+        ], 422);
+    }
+
+    $purchaseOrder->status = 'ordered';
+    $purchaseOrder->receiving_status = 'pending';
+    $purchaseOrder->save();
 
     return response()->json([
         'message' =>
             'Purchase order confirmed successfully.',
 
-        'data' => $purchaseOrder->fresh(),
+        'data' => $purchaseOrder
+            ->fresh()
+            ->load([
+                'supplier',
+                'location',
+                'items.product',
+            ]),
     ]);
 }
 
@@ -551,4 +579,6 @@ class PurchaseOrderController extends Controller implements HasMiddleware
             'You are not assigned to this location.'
         );
     }
+
+
 }

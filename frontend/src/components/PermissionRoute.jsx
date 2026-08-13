@@ -1,9 +1,19 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 import useAuth from "../context/useAuth";
 
 function PermissionRoute({ permission }) {
   const location = useLocation();
-  const { user, loading, isAuthenticated, hasPermission } = useAuth();
+
+  const {
+    user,
+    loading,
+    isAuthenticated,
+    hasPermission,
+  } = useAuth();
 
   if (loading) {
     return (
@@ -14,11 +24,33 @@ function PermissionRoute({ permission }) {
   }
 
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location }}
+      />
+    );
   }
 
-  if (!permission || !hasPermission(permission)) {
-    return <Navigate to="/app/dashboard" replace />;
+  const role = user.role
+    ?.trim()
+    .toLowerCase();
+
+  const isAdmin = role === "admin";
+
+  // Admin can access every feature.
+  // Other users need the requested permission.
+  if (
+    !isAdmin &&
+    !hasPermission(permission)
+  ) {
+    return (
+      <Navigate
+        to="/app/dashboard"
+        replace
+      />
+    );
   }
 
   return <Outlet />;

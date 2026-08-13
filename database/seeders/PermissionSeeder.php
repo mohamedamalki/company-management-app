@@ -52,6 +52,27 @@ class PermissionSeeder extends Seeder
 
             'payment-methods.view',
             'payment-methods.manage',
+            'location-stocks.view',
+            'location-stocks.manage',
+
+            'stock-movements.view',
+            'stock-movements.manage',
+            'purchase-receipts.view',
+            'purchase-receipts.manage',
+            'purchase-receipts.validate',
+            'customers.view',
+            'customers.manage',
+
+            'sales.view',
+            'sales.manage',
+            'sales.confirm',
+            'sales.cancel',
+
+            'sale-payments.view',
+            'sale-payments.manage',
+            'fournisseurs.view',
+            'fournisseurs.manage',
+            'fournisseurs.statement',
         ];
 
         foreach ($permissions as $permission) {

@@ -58,6 +58,27 @@ import PurchaseOrdersUpdate from "./pages/purchaseOrders/PurchaseOrdersUpdate";
 import PurchaseOrderDetails from "./pages/purchaseOrders/PurchaseOrdersDetails";
 
 import UserPermissionsPage from "./pages/permissions/UserPermissionsPage";
+import LocationStocksPage from "./pages/locationStocks/LocationStocksPage";
+import LocationStocksCreate from "./pages/locationStocks/LocationStocksCreate";
+import LocationStocksUpdateMinimum from "./pages/locationStocks/LocationStocksUpdateMinimum";
+import StockMovementsPage from "./pages/stockMovements/StockMovementsPage";
+import StockMovementsCreate from "./pages/stockMovements/StockMovementsCreate";
+import PurchaseReceiptsPage from "./pages/purchaseReceipts/PurchaseReceiptsPage";
+import PurchaseReceiptDetails from "./pages/purchaseReceipts/PurchaseReceiptDetails";
+import PurchaseReceiptsCreate from "./pages/purchaseReceipts/PurchaseReceiptsCreate";
+import PurchaseReceiptsUpdate from "./pages/purchaseReceipts/PurchaseReceiptsUpdate";
+import CustomersPage from "./pages/customers/CustomersPage";
+import CustomersCreate from "./pages/customers/CustomersCreate";
+import CustomersUpdate from "./pages/customers/CustomersUpdate";
+
+import SalesPage from "./pages/sales/SalesPage";
+import SalesCreate from "./pages/sales/SalesCreate";
+import SalesUpdate from "./pages/sales/SalesUpdate";
+import SaleDetails from "./pages/sales/SaleDetails";
+import FournisseursCreate from "./pages/fournisseurs/FournisseursCreate";
+import FournisseursUpdate from "./pages/fournisseurs/FournisseursUpdate";
+import FournisseursPage from "./pages/fournisseurs/FournisseursPage";
+import FournisseurDetails from "./pages/fournisseurs/FournisseursDetails";
 
 function App() {
     return (
@@ -470,6 +491,181 @@ function App() {
                             }
                         />
                     </Route>
+
+                    {/* Location stocks — view */}
+                    <Route
+                    element={
+                        <PermissionRoute permission="location-stocks.view" />
+                    }
+                    >
+                    <Route
+                        path="location-stocks"
+                        element={<LocationStocksPage />}
+                    />
+                    </Route>
+
+                        {/* Location stocks — manage */}
+                    <Route
+                    element={
+                        <PermissionRoute permission="location-stocks.manage" />
+                    }
+                    >
+                    <Route
+                        path="location-stocks/create"
+                        element={<LocationStocksCreate />}
+                    />
+
+                    <Route
+                        path="location-stocks/:id/minimum-quantity"
+                        element={<LocationStocksUpdateMinimum />}
+                    />
+                    </Route>
+                        {/* Stock movements — view */}
+                    <Route
+                    element={
+                        <PermissionRoute permission="stock-movements.view" />
+                    }
+                    >
+                    <Route
+                        path="stock-movements"
+                        element={<StockMovementsPage />}
+                    />
+                    </Route>
+
+                    {/* Stock movements — manage */}
+                    <Route
+                    element={
+                        <PermissionRoute permission="stock-movements.manage" />
+                    }
+                    >
+                    <Route
+                        path="stock-movements/create"
+                        element={<StockMovementsCreate />}
+                    />
+                    </Route>
+
+                    <Route
+                        element={
+                            <PermissionRoute permission="purchase-receipts.view" />
+                        }
+                    >
+                    <Route
+                        path="purchase-receipts"
+                        element={<PurchaseReceiptsPage />}
+                    />
+
+                    <Route
+                        path="purchase-receipts/:id"
+                        element={<PurchaseReceiptDetails />}
+                    />
+                </Route>
+
+                <Route
+                    element={
+                        <PermissionRoute permission="purchase-receipts.manage" />
+                    }
+                >
+                <Route
+                    path="purchase-receipts/create"
+                    element={<PurchaseReceiptsCreate />}
+                />
+
+                <Route
+                    path="purchase-receipts/:id/edit"
+                    element={<PurchaseReceiptsUpdate />}
+                />
+
+                <Route
+    element={
+        <PermissionRoute permission="customers.view" />
+    }
+>
+    <Route
+        path="customers"
+        element={<CustomersPage />}
+    />
+</Route>
+
+<Route
+    element={
+        <PermissionRoute permission="customers.manage" />
+    }
+>
+    <Route
+        path="customers/create"
+        element={<CustomersCreate />}
+    />
+
+    <Route
+        path="customers/:id/edit"
+        element={<CustomersUpdate />}
+    />
+</Route>
+
+<Route
+    element={
+        <PermissionRoute permission="sales.view" />
+    }
+>
+    <Route
+        path="sales"
+        element={<SalesPage />}
+    />
+
+    <Route
+        path="sales/:id"
+        element={<SaleDetails />}
+    />
+</Route>
+
+<Route
+    element={
+        <PermissionRoute permission="sales.manage" />
+    }
+>
+    <Route
+        path="sales/create"
+        element={<SalesCreate />}
+    />
+
+    <Route
+        path="sales/:id/edit"
+        element={<SalesUpdate />}
+    />
+</Route>
+
+    <Route
+    element={
+        <PermissionRoute permission="fournisseurs.view" />
+    }
+>
+    <Route
+        path="fournisseurs"
+        element={<FournisseursPage />}
+    />
+
+    <Route
+        path="fournisseurs/:id"
+        element={<FournisseurDetails />}
+    />
+</Route>
+
+<Route
+    element={
+        <PermissionRoute permission="fournisseurs.manage" />
+    }
+>
+    <Route
+        path="fournisseurs/create"
+        element={<FournisseursCreate />}
+    />
+
+    <Route
+        path="fournisseurs/:id/edit"
+        element={<FournisseursUpdate />}
+    />
+</Route>
+            </Route>
 
                     {/* Unknown authenticated route */}
                     <Route

@@ -117,7 +117,7 @@ class UserPermissionController extends Controller
 
         return response()->json([
             'message' =>
-                'User permissions updated successfully.',
+                'User permissions created successfully.',
 
             'data' => [
                 'user' => $user->only([
@@ -137,80 +137,115 @@ class UserPermissionController extends Controller
     /**
      * Return the names of every assignable permission.
      */
-    private function assignablePermissionNames(): Collection
-    {
-        return Permission::query()
-            ->where('guard_name', 'web')
-            ->whereNotIn(
-                'name',
-                self::ADMIN_ONLY_PERMISSIONS
-            )
-            ->orderBy('name')
-            ->pluck('name');
-    }
+private function assignablePermissionNames(): Collection
+{
+    $configuredPermissions = collect(
+        config('feature_permissions.features', [])
+    )
+        ->filter(
+            fn (array $feature) =>
+                $feature['assignable'] ?? false
+        )
+        ->flatMap(
+            fn (array $feature) =>
+                array_keys(
+                    $feature['permissions'] ?? []
+                )
+        )
+        ->unique()
+        ->values();
+
+    return Permission::query()
+        ->where('guard_name', 'web')
+        ->whereIn('name', $configuredPermissions)
+        ->orderBy('name')
+        ->pluck('name');
+}
 
     /**
      * Return assignable permissions grouped by feature.
-     */
-    private function groupedAssignablePermissions(): Collection
-    {
-        return Permission::query()
-            ->where('guard_name', 'web')
-            ->whereNotIn(
-                'name',
-                self::ADMIN_ONLY_PERMISSIONS
+     **/
+private function groupedAssignablePermissions(): Collection
+{
+    $features = collect(
+        config('feature_permissions.features', [])
+    )->filter(
+        fn (array $feature) =>
+            $feature['assignable'] ?? false
+    );
+
+    $configuredPermissionNames = $features
+        ->flatMap(
+            fn (array $feature) =>
+                array_keys(
+                    $feature['permissions'] ?? []
+                )
+        )
+        ->unique()
+        ->values();
+
+    $databasePermissions = Permission::query()
+        ->where('guard_name', 'web')
+        ->whereIn(
+            'name',
+            $configuredPermissionNames
+        )
+        ->get([
+            'id',
+            'name',
+        ])
+        ->keyBy('name');
+
+    return $features
+        ->map(function (
+            array $feature,
+            string $featureKey
+        ) use ($databasePermissions) {
+            $permissions = collect(
+                $feature['permissions'] ?? []
             )
-            ->orderBy('name')
-            ->get([
-                'id',
-                'name',
-            ])
-            ->groupBy(
-                fn (Permission $permission) =>
-                    Str::beforeLast(
-                        $permission->name,
-                        '.'
-                    )
-            )
-            ->map(function (
-                Collection $permissions,
-                string $feature
-            ) {
-                return [
-                    'feature' => $feature,
+                ->map(function (
+                    string $label,
+                    string $permissionName
+                ) use ($databasePermissions) {
+                    $permission = $databasePermissions
+                        ->get($permissionName);
 
-                    'label' => Str::headline(
-                        str_replace(
-                            '.',
-                            ' ',
-                            $feature
-                        )
-                    ),
+                    if (!$permission) {
+                        return null;
+                    }
 
-                    'permissions' => $permissions
-                        ->map(
-                            fn (Permission $permission) => [
-                                'id' => $permission->id,
-                                'name' => $permission->name,
+                    return [
+                        'id' => $permission->id,
+                        'name' => $permission->name,
 
-                                'action' => Str::afterLast(
-                                    $permission->name,
-                                    '.'
-                                ),
+                        'action' => Str::afterLast(
+                            $permission->name,
+                            '.'
+                        ),
 
-                                'label' => Str::headline(
-                                    Str::afterLast(
-                                        $permission->name,
-                                        '.'
-                                    )
-                                ),
-                            ]
-                        )
-                        ->values(),
-                ];
-            })
-            ->values();
-    }
+                        'label' => $label,
+                    ];
+                })
+                ->filter()
+                ->values();
+
+            return [
+                'feature' => $featureKey,
+
+                'label' =>
+                    $feature['label']
+                    ?? Str::headline($featureKey),
+
+                'permissions' => $permissions,
+            ];
+        })
+        ->filter(
+            fn (array $feature) =>
+                $feature['permissions']->isNotEmpty()
+        )
+        ->values();
+}
 
     /**
      * Only these user types can receive permissions.

@@ -32,12 +32,26 @@ class Location extends Model
     }
 
     public function stocks(): HasMany
-{
+    {
     return $this->hasMany(LocationStock::class);
-}
+    }
 
-public function stockMovements(): HasMany
-{
+    public function stockMovements(): HasMany
+    {
     return $this->hasMany(StockMovement::class);
-}
+    }
+
+    public function purchaseReceipts(): HasMany
+    {
+    return $this->hasMany(
+        PurchaseReceipt::class
+    );
+    }
+
+    public function sales(): HasMany
+    {
+    return $this->hasMany(
+        Sale::class
+    );
+    }
 }

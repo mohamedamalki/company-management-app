@@ -3,12 +3,19 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\FournisseurController;
 use App\Http\Controllers\Api\LocationAssignmentController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\LocationStockController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductPriceController;
 use App\Http\Controllers\Api\PurchaseOrderController;
+use App\Http\Controllers\Api\PurchaseReceiptController;
+use App\Http\Controllers\Api\SaleController;
+use App\Http\Controllers\Api\SalePaymentController;
+use App\Http\Controllers\Api\StockMovementController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\TaxRateController;
 use App\Http\Controllers\Api\UserController;
@@ -34,15 +41,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    /*
-    |----------------------------------------------------------------------
-    | Administrator access management
-    |----------------------------------------------------------------------
-    |
-    | Roles do not control normal business features. The admin role is used
-    | here only because these routes change accounts, assignments and access.
-    |
-    */
 
     Route::middleware('role:admin')->group(function () {
         Route::middleware('can:users.manage')->group(function () {
@@ -85,16 +83,6 @@ Route::middleware('auth:sanctum')->group(function () {
             });
     });
 
-    /*
-    |----------------------------------------------------------------------
-    | Special business routes
-    |----------------------------------------------------------------------
-    |
-    | Keep fixed paths before apiResource routes containing model parameters.
-    | These methods need explicit middleware unless they are also included in
-    | the corresponding controller's HasMiddleware configuration.
-    |
-    */
 
     Route::get(
         '/payment-methods/active',
@@ -136,17 +124,6 @@ Route::middleware('auth:sanctum')->group(function () {
         [PurchaseOrderController::class, 'pdf']
     )->middleware('can:purchase-orders.view');
 
-    /*
-    |----------------------------------------------------------------------
-    | Business resources
-    |----------------------------------------------------------------------
-    |
-    | Each controller must use HasMiddleware to protect read methods with
-    | *.view and write methods with *.manage. Do not wrap these resources in
-    | role:admin, because other roles can receive the same permissions.
-    |
-    */
-
     Route::apiResource('locations', LocationController::class)
         ->except('destroy');
 
@@ -167,6 +144,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('tax-rates', TaxRateController::class)
         ->except('destroy');
 
+    Route::patch(
+    '/purchase-orders/{purchaseOrder}/confirm',
+    [
+        PurchaseOrderController::class,
+        'confirm',
+    ]
+    )->middleware('can:purchase-orders.confirm');
+
     Route::apiResource(
         'product-prices',
         ProductPriceController::class
@@ -178,4 +163,151 @@ Route::middleware('auth:sanctum')->group(function () {
         'purchase-orders',
         PurchaseOrderController::class
     )->except('destroy');
+
+
+    Route::get(
+    '/location-stocks/options',
+    [
+        LocationStockController::class,
+        'options',
+    ]
+    );
+
+    Route::patch(
+    '/location-stocks/{locationStock}/minimum-quantity',
+    [
+        LocationStockController::class,
+        'updateMinimumQuantity',
+    ]
+    );
+
+
+    Route::apiResource(
+        'location-stocks',
+        LocationStockController::class
+    )->only([
+        'index',
+        'store',
+        'show',
+    ]);
+
+    Route::apiResource(
+        'stock-movements',
+        StockMovementController::class
+    )->only([
+        'index',
+        'store',
+        'show',
+    ]);
+
+    Route::get('/purchase-receipts/receivable-orders',
+        [
+        PurchaseReceiptController::class,
+        'receivableOrders',
+        ]
+        );
+
+    Route::patch('/purchase-receipts/{purchaseReceipt}/validate',
+        [
+        PurchaseReceiptController::class,
+        'validateReceipt',
+        ]
+        );
+
+    Route::apiResource('purchase-receipts',PurchaseReceiptController::class);
+
+    /*
+|--------------------------------------------------------------------------
+| Sales special routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/customers/active',
+    [
+        CustomerController::class,
+        'active',
+    ]
+);
+
+Route::get(
+    '/sales/options',
+    [
+        SaleController::class,
+        'options',
+    ]
+);
+
+Route::patch(
+    '/sales/{sale}/confirm',
+    [
+        SaleController::class,
+        'confirm',
+    ]
+);
+
+Route::patch(
+    '/sales/{sale}/cancel',
+    [
+        SaleController::class,
+        'cancel',
+    ]
+);
+
+Route::get(
+    '/sales/{sale}/payments',
+    [
+        SalePaymentController::class,
+        'index',
+    ]
+);
+
+Route::post(
+    '/sales/{sale}/payments',
+    [
+        SalePaymentController::class,
+        'store',
+    ]
+);
+
+/*
+|--------------------------------------------------------------------------
+| Sales resources
+|--------------------------------------------------------------------------
+*/
+
+Route::apiResource(
+    'customers',
+    CustomerController::class
+)->only([
+    'index',
+    'store',
+    'show',
+    'update',
+]);
+
+        Route::get(
+        '/fournisseur/my-account',
+        [FournisseurController::class, 'myAccount']
+    );
+
+    Route::apiResource(
+        'fournisseurs',
+        FournisseurController::class
+    )->only([
+        'index',
+        'store',
+        'show',
+        'update',
+    ]);
+
+Route::apiResource(
+    'sales',
+    SaleController::class
+)->only([
+    'index',
+    'store',
+    'show',
+    'update',
+]);
 });

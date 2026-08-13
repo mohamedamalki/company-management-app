@@ -11,6 +11,12 @@ class PurchaseOrder extends Model
 {
     use HasFactory;
 
+    public const RECEIVING_PENDING = 'pending';
+
+    public const RECEIVING_PARTIALLY_RECEIVED = 'partially_received';
+
+    public const RECEIVING_RECEIVED = 'received';
+
     protected $fillable = [
         'order_number',
         'supplier_id',
@@ -19,6 +25,7 @@ class PurchaseOrder extends Model
         'order_date',
         'expected_date',
         'status',
+        'receiving_status',
         'subtotal_ht',
         'tax_amount',
         'total_ttc',
@@ -51,6 +58,13 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(
             PurchaseOrderItem::class
+        );
+    }
+
+    public function receipts(): HasMany
+    {
+        return $this->hasMany(
+            PurchaseReceipt::class
         );
     }
 }

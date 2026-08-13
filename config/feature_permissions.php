@@ -153,5 +153,89 @@ return [
                     'Manage permissions',
             ],
         ],
+
+        'location-stocks' => [
+            'label' => 'Location stocks',
+            'assignable' => true,
+
+            'permissions' => [
+                'location-stocks.view' =>
+                    'View location stocks',
+
+                'location-stocks.manage' =>
+                    'Manage location stocks',
+            ],
+        ],
+
+        'stock-movements' => [
+            'label' => 'Stock movements',
+            'assignable' => true,
+
+            'permissions' => [
+                'stock-movements.view' => 'View stock movements',
+                'stock-movements.manage' => 'Manage stock movements',
+            ],
+        ],
+
+        'purchase-receipts' => [
+            'label' => 'Purchase receipts',
+            'assignable' => true,
+
+            'permissions' => [
+                'purchase-receipts.view' =>
+                    'View purchase receipts',
+
+                'purchase-receipts.manage' =>
+                    'Create and update purchase receipts',
+
+                'purchase-receipts.validate' =>
+                    'Validate receipts and update stock',
+            ],
+        ],
+
+        'customers' => [
+    'label' => 'Customers',
+    'assignable' => true,
+
+    'permissions' => [
+        'customers.view' =>
+            'View customers',
+
+        'customers.manage' =>
+            'Manage customers',
+    ],
+],
+
+'sales' => [
+    'label' => 'Sales',
+    'assignable' => true,
+
+    'permissions' => [
+        'sales.view' =>
+            'View sales',
+
+        'sales.manage' =>
+            'Manage sales',
+
+        'sales.confirm' =>
+            'Confirm sales',
+
+        'sales.cancel' =>
+            'Cancel sales',
+    ],
+],
+
+'sale-payments' => [
+    'label' => 'Sale payments',
+    'assignable' => true,
+
+    'permissions' => [
+        'sale-payments.view' =>
+            'View sale payments',
+
+        'sale-payments.manage' =>
+            'Record sale payments',
+    ],
+],
     ],
 ];

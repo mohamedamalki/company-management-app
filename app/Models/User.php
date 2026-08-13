@@ -5,7 +5,6 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -52,30 +51,80 @@ class User extends Authenticatable
         ];
     }
 
-    public function location(): BelongsTo
-    {
-    return $this->belongsTo(Location::class);
-    }
-
-    public function locationAssignment(): HasOne
-    {
-    return $this->hasOne(
-        LocationAssignment::class
-    );
-    }
-
     public function stockMovements(): HasMany
 {
     return $this->hasMany(StockMovement::class);
 }
 
     public function assignedLocations(): BelongsToMany
-{
+    {
     return $this->belongsToMany(
         Location::class,
         'location_assignments',
         'user_id',
         'location_id'
     )->withTimestamps();
+    }
+
+    public function createdPurchaseReceipts(): HasMany
+    {
+    return $this->hasMany(
+        PurchaseReceipt::class,
+        'created_by'
+    );
+    }
+
+    public function validatedPurchaseReceipts(): HasMany
+    {
+    return $this->hasMany(
+        PurchaseReceipt::class,
+        'validated_by'
+    );
+    }
+
+    public function customerAccount(): HasOne
+    {
+    return $this->hasOne(Customer::class);
+    }
+
+        public function fournisseurAccount(): HasOne
+    {
+        return $this->hasOne(Customer::class)
+            ->where(
+                'category',
+                Customer::CATEGORY_FOURNISSEUR
+            );
+    }
+
+public function createdSales(): HasMany
+{
+    return $this->hasMany(
+        Sale::class,
+        'created_by'
+    );
+}
+
+public function confirmedSales(): HasMany
+{
+    return $this->hasMany(
+        Sale::class,
+        'confirmed_by'
+    );
+}
+
+public function cancelledSales(): HasMany
+{
+    return $this->hasMany(
+        Sale::class,
+        'cancelled_by'
+    );
+}
+
+public function receivedSalePayments(): HasMany
+{
+    return $this->hasMany(
+        SalePayment::class,
+        'received_by'
+    );
 }
 }
