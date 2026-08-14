@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreSalePaymentRequest extends FormRequest
 {
@@ -14,30 +13,13 @@ class StoreSalePaymentRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'reference' =>
-                $this->filled('reference')
-                    ? trim(
-                        $this->input(
-                            'reference'
-                        )
-                    )
+        if ($this->has('reference')) {
+            $this->merge([
+                'reference' => $this->filled('reference')
+                    ? trim($this->input('reference'))
                     : null,
-
-            'paid_at' =>
-                $this->filled('paid_at')
-                    ? $this->input(
-                        'paid_at'
-                    )
-                    : null,
-
-            'notes' =>
-                $this->filled('notes')
-                    ? trim(
-                        $this->input('notes')
-                    )
-                    : null,
-        ]);
+            ]);
+        }
     }
 
     public function rules(): array
@@ -46,17 +28,7 @@ class StoreSalePaymentRequest extends FormRequest
             'payment_method_id' => [
                 'required',
                 'integer',
-
-                Rule::exists(
-                    'payment_methods',
-                    'id'
-                )->where(
-                    fn ($query) =>
-                        $query->where(
-                            'status',
-                            'active'
-                        )
-                ),
+                'exists:payment_methods,id',
             ],
 
             'amount' => [
@@ -75,12 +47,7 @@ class StoreSalePaymentRequest extends FormRequest
             'paid_at' => [
                 'nullable',
                 'date',
-            ],
-
-            'notes' => [
-                'nullable',
-                'string',
-                'max:1000',
+                'before_or_equal:now',
             ],
         ];
     }

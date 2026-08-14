@@ -8,6 +8,7 @@ use App\Models\PaymentMethod;
 use App\Models\Sale;
 use App\Models\SalePayment;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -24,19 +25,89 @@ class SalePaymentController extends Controller implements HasMiddleware
             new Middleware(
                 'can:sale-payments.view',
                 only: [
+                    'outstanding',
                     'index',
                 ]
             ),
 
             new Middleware(
                 'can:sale-payments.manage',
-                only: [
-                    'store',
-                ]
+                only: ['store']
             ),
         ];
     }
 
+    /**
+     * Return confirmed sales that still have an unpaid balance.
+     */
+    public function outstanding(Request $request): JsonResponse
+    {
+        $perPage = min(
+            max($request->integer('per_page', 15), 1),
+            100
+        );
+
+        $query = Sale::query()
+            ->with([
+                'customer:id,code,name,category',
+                'location:id,name,code',
+                'creator:id,name',
+            ])
+            ->withCount('items')
+            ->where('status', Sale::STATUS_CONFIRMED)
+            ->whereColumn('paid_amount', '<', 'total_ttc');
+
+        $this->applyLocationScope(
+            $query,
+            $request->user()
+        );
+
+        $sales = $query
+            ->when(
+                $request->filled('payment_status'),
+                fn (Builder $query) => $query->where(
+                    'payment_status',
+                    $request->input('payment_status')
+                )
+            )
+            ->when(
+                $request->filled('search'),
+                function (Builder $query) use ($request) {
+                    $search = trim(
+                        $request->input('search')
+                    );
+
+                    $query->where(
+                        function (Builder $query) use ($search) {
+                            $query
+                                ->where(
+                                    'sale_number',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhereHas(
+                                    'customer',
+                                    fn (Builder $query) =>
+                                        $query->where(
+                                            'name',
+                                            'like',
+                                            "%{$search}%"
+                                        )
+                                );
+                        }
+                    );
+                }
+            )
+            ->latest('sale_date')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return response()->json($sales);
+    }
+
+    /**
+     * Return one sale's payment history.
+     */
     public function index(
         Request $request,
         Sale $sale
@@ -46,6 +117,11 @@ class SalePaymentController extends Controller implements HasMiddleware
             $sale->location_id
         );
 
+        $perPage = min(
+            max($request->integer('per_page', 15), 1),
+            100
+        );
+
         $payments = $sale
             ->payments()
             ->with([
@@ -53,13 +129,32 @@ class SalePaymentController extends Controller implements HasMiddleware
                 'receiver:id,name',
             ])
             ->latest('paid_at')
-            ->get();
+            ->paginate($perPage);
 
         return response()->json([
-            'data' => $payments,
+            'sale' => $this->saleSummary($sale),
+
+            'data' => $payments->items(),
+
+            'meta' => [
+                'current_page' =>
+                    $payments->currentPage(),
+
+                'last_page' =>
+                    $payments->lastPage(),
+
+                'per_page' =>
+                    $payments->perPage(),
+
+                'total' =>
+                    $payments->total(),
+            ],
         ]);
     }
 
+    /**
+     * Record another payment against a sale balance.
+     */
     public function store(
         StoreSalePaymentRequest $request,
         Sale $sale
@@ -68,23 +163,18 @@ class SalePaymentController extends Controller implements HasMiddleware
         $user = $request->user();
 
         $payment = DB::transaction(
-            function () use (
-                $data,
-                $user,
-                $sale
-            ) {
-                $sale = Sale::query()
+            function () use ($sale, $data, $user) {
+                $lockedSale = Sale::query()
                     ->lockForUpdate()
                     ->findOrFail($sale->id);
 
-                $this
-                    ->ensureUserCanAccessLocation(
-                        $user,
-                        $sale->location_id
-                    );
+                $this->ensureUserCanAccessLocation(
+                    $user,
+                    $lockedSale->location_id
+                );
 
                 if (
-                    $sale->status !==
+                    $lockedSale->status !==
                     Sale::STATUS_CONFIRMED
                 ) {
                     throw ValidationException::withMessages([
@@ -93,140 +183,180 @@ class SalePaymentController extends Controller implements HasMiddleware
                     ]);
                 }
 
-                $paymentMethod =
-                    PaymentMethod::query()
-                        ->where(
-                            'status',
-                            'active'
-                        )
-                        ->findOrFail(
-                            $data[
-                                'payment_method_id'
-                            ]
-                        );
+                $totalAmount = round(
+                    (float) $lockedSale->total_ttc,
+                    2
+                );
+
+                // Lock existing payment rows while calculating the balance.
+                $recordedPaidAmount = round(
+                    (float) $lockedSale
+                        ->payments()
+                        ->lockForUpdate()
+                        ->get(['id', 'amount'])
+                        ->sum('amount'),
+                    2
+                );
+
+                $remainingAmount = round(
+                    max(
+                        $totalAmount - $recordedPaidAmount,
+                        0
+                    ),
+                    2
+                );
+
+                if ($remainingAmount <= 0) {
+                    throw ValidationException::withMessages([
+                        'amount' =>
+                            'This sale is already fully paid.',
+                    ]);
+                }
+
+                $amount = round(
+                    (float) $data['amount'],
+                    2
+                );
+
+                if ($amount > $remainingAmount) {
+                    throw ValidationException::withMessages([
+                        'amount' =>
+                            "The payment cannot exceed the remaining amount of {$remainingAmount} MAD.",
+                    ]);
+                }
+
+                $paymentMethod = PaymentMethod::query()
+                    ->where('status', 'active')
+                    ->find($data['payment_method_id']);
+
+                if (!$paymentMethod) {
+                    throw ValidationException::withMessages([
+                        'payment_method_id' =>
+                            'The selected payment method is invalid or inactive.',
+                    ]);
+                }
+
+                $reference = filled(
+                    $data['reference'] ?? null
+                )
+                    ? trim($data['reference'])
+                    : null;
 
                 if (
-                    $paymentMethod
-                        ->requires_reference &&
-                    empty($data['reference'])
+                    (bool) $paymentMethod->requires_reference &&
+                    !$reference
                 ) {
                     throw ValidationException::withMessages([
                         'reference' =>
-                            'A reference is required for this payment method.',
+                            'The payment reference is required for this payment method.',
                     ]);
                 }
 
-                $currentPaid = (float)
-                    $sale
-                        ->payments()
-                        ->sum('amount');
-
-                $remaining = max(
-                    (float)
-                        $sale->total_ttc -
-                        $currentPaid,
-                    0
-                );
-
-                $amount =
-                    (float) $data['amount'];
-
-                if (
-                    $amount >
-                    $remaining + 0.005
-                ) {
-                    throw ValidationException::withMessages([
-                        'amount' =>
-                            "The payment exceeds the remaining amount ({$remaining} MAD).",
-                    ]);
-                }
-
-                $payment =
-                    $sale->payments()->create([
+                $payment = $lockedSale
+                    ->payments()
+                    ->create([
                         'payment_number' =>
-                            $this
-                                ->generatePaymentNumber(),
+                            $this->generatePaymentNumber(),
 
                         'payment_method_id' =>
                             $paymentMethod->id,
 
-                        'received_by' =>
-                            $user->id,
+                        'received_by' => $user->id,
 
-                        'amount' =>
-                            $amount,
+                        'amount' => $amount,
 
-                        'reference' =>
-                            $data['reference']
-                            ?? null,
+                        'reference' => $reference,
 
                         'paid_at' =>
-                            $data['paid_at']
-                            ?? now(),
-
-                        'notes' =>
-                            $data['notes']
-                            ?? null,
+                            $data['paid_at'] ?? now(),
                     ]);
 
-                $this
-                    ->updateSalePaymentStatus(
-                        $sale
-                    );
+                $newPaidAmount = round(
+                    $recordedPaidAmount + $amount,
+                    2
+                );
+
+                $paymentStatus =
+                    $newPaidAmount >= $totalAmount
+                        ? Sale::PAYMENT_PAID
+                        : Sale::PAYMENT_PARTIALLY_PAID;
+
+                $lockedSale->update([
+                    'paid_amount' => $newPaidAmount,
+                    'payment_status' => $paymentStatus,
+                ]);
 
                 return $payment;
             }
         );
 
+        $sale->refresh();
+
         return response()->json([
             'message' =>
                 'Payment recorded successfully.',
 
-            'data' => $payment->load([
-                'paymentMethod:id,name,code',
-                'receiver:id,name',
-            ]),
+            'data' => [
+                'payment' => $payment->load([
+                    'paymentMethod:id,name,code',
+                    'receiver:id,name',
+                ]),
+
+                'sale' => $this->saleSummary($sale),
+            ],
         ], 201);
     }
 
-    private function updateSalePaymentStatus(
-        Sale $sale
+    private function saleSummary(Sale $sale): array
+    {
+        $totalAmount = round(
+            (float) $sale->total_ttc,
+            2
+        );
+
+        $paidAmount = round(
+            (float) $sale->paid_amount,
+            2
+        );
+
+        return [
+            'id' => $sale->id,
+            'sale_number' => $sale->sale_number,
+            'customer_id' => $sale->customer_id,
+            'location_id' => $sale->location_id,
+            'status' => $sale->status,
+            'payment_status' =>
+                $sale->payment_status,
+            'total_ttc' => $totalAmount,
+            'paid_amount' => $paidAmount,
+            'remaining_amount' => round(
+                max($totalAmount - $paidAmount, 0),
+                2
+            ),
+        ];
+    }
+
+    private function applyLocationScope(
+        Builder $query,
+        User $user
     ): void {
-        $paidAmount = (float)
-            $sale
-                ->payments()
-                ->sum('amount');
+        if ($this->isAdmin($user)) {
+            return;
+        }
 
-        $totalTtc =
-            (float) $sale->total_ttc;
-
-        $sale->paid_amount =
-            round($paidAmount, 2);
-
-        $sale->payment_status =
-            match (true) {
-                $paidAmount <= 0 =>
-                    Sale::PAYMENT_UNPAID,
-
-                $paidAmount + 0.005 >=
-                    $totalTtc =>
-                    Sale::PAYMENT_PAID,
-
-                default =>
-                    Sale::PAYMENT_PARTIALLY_PAID,
-            };
-
-        $sale->save();
+        $query->whereIn(
+            'location_id',
+            $user
+                ->assignedLocations()
+                ->select('locations.id')
+        );
     }
 
     private function ensureUserCanAccessLocation(
         User $user,
         int $locationId
     ): void {
-        if (
-            $user->role === 'admin' ||
-            $user->hasRole('admin')
-        ) {
+        if ($this->isAdmin($user)) {
             return;
         }
 
@@ -242,13 +372,26 @@ class SalePaymentController extends Controller implements HasMiddleware
         );
     }
 
+    private function isAdmin(User $user): bool
+    {
+        return $user->role === 'admin' ||
+            $user->hasRole('admin');
+    }
+
     private function generatePaymentNumber(): string
     {
-        return 'PAY-' .
-            now()->format('Ymd-His') .
-            '-' .
-            Str::upper(
-                Str::random(6)
-            );
+        do {
+            $number =
+                'PAY-' .
+                now()->format('Ymd-His') .
+                '-' .
+                Str::upper(Str::random(6));
+        } while (
+            SalePayment::query()
+                ->where('payment_number', $number)
+                ->exists()
+        );
+
+        return $number;
     }
 }

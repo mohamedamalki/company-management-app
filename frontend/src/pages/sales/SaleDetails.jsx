@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import api from "../../api/axios";
-import SalePaymentForm from "../../components/sales/SalePaymentForm";
+import SalePaymentForm from "../../components/salePayments/SalePaymentForm";
 import useAuth from "../../context/useAuth";
 
 function formatMoney(value) {

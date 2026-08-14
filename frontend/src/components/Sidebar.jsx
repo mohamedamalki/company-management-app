@@ -19,7 +19,9 @@ import {
     WalletCards,
     Warehouse,
     X,
-    Handshake
+    Handshake,
+    HandCoins,
+    RotateCcw
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import useAuth from "../context/useAuth";
@@ -150,6 +152,18 @@ const navigationSections = [
                 to: "/app/fournisseurs",
                 icon: Handshake,
                 permission: "fournisseurs.view",
+            },
+            {
+                label: "Sale balances",
+                to: "/app/sale-balances",
+                icon: HandCoins,
+                permission: "sale-payments.view",
+            },
+            {
+                label: "Sale returns",
+                to: "/app/sale-returns",
+                icon: RotateCcw,
+                permission: "sale-returns.view",
             },
         ],
     },

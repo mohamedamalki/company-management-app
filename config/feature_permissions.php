@@ -206,36 +206,58 @@ return [
     ],
 ],
 
-'sales' => [
-    'label' => 'Sales',
-    'assignable' => true,
+        'sales' => [
+            'label' => 'Sales',
+            'assignable' => true,
 
-    'permissions' => [
-        'sales.view' =>
-            'View sales',
+            'permissions' => [
+                'sales.view' =>
+                    'View sales',
 
-        'sales.manage' =>
-            'Manage sales',
+                'sales.manage' =>
+                    'Manage sales',
 
-        'sales.confirm' =>
-            'Confirm sales',
+                'sales.confirm' =>
+                    'Confirm sales',
 
-        'sales.cancel' =>
-            'Cancel sales',
-    ],
-],
+                'sales.cancel' =>
+                    'Cancel sales',
+            ],
+        ],
 
-'sale-payments' => [
-    'label' => 'Sale payments',
-    'assignable' => true,
+        'sale-payments' => [
+            'label' => 'Sale payments',
+            'assignable' => true,
 
-    'permissions' => [
-        'sale-payments.view' =>
-            'View sale payments',
+            'permissions' => [
+                'sale-payments.view' =>
+                    'View outstanding balances and payments',
 
-        'sale-payments.manage' =>
-            'Record sale payments',
-    ],
-],
+                'sale-payments.manage' =>
+                    'Record sale payments',
+            ],
+        ],
+
+        'sale-returns' => [
+            'label' => 'Sale returns',
+            'assignable' => true,
+
+            'permissions' => [
+                'sale-returns.view' =>
+                    'View sale returns and refunds',
+
+                'sale-returns.manage' =>
+                    'Create, validate, cancel and refund sale returns',
+            ],
+        ],
+
+        'dashboard' => [
+            'label' => 'Dashboard',
+            'assignable' => true,
+
+            'permissions' => [
+                'dashboard.view' => 'View dashboard',
+            ],
+        ],
     ],
 ];

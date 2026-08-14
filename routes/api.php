@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\FournisseurController;
 use App\Http\Controllers\Api\LocationAssignmentController;
 use App\Http\Controllers\Api\LocationController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\PurchaseReceiptController;
 use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\SalePaymentController;
+use App\Http\Controllers\Api\SaleRefundController;
+use App\Http\Controllers\Api\SaleReturnController;
 use App\Http\Controllers\Api\StockMovementController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\TaxRateController;
@@ -28,8 +31,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::post('/login', [AuthController::class, 'login'])
-    ->middleware('throttle:5,1');
+Route::post("/login", [AuthController::class, "login"])->middleware(
+    "throttle:5,1",
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -37,248 +41,290 @@ Route::post('/login', [AuthController::class, 'login'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+Route::middleware("auth:sanctum")->group(function () {
+    Route::get("/me", [AuthController::class, "me"]);
 
+    Route::post("/logout", [AuthController::class, "logout"]);
 
-    Route::middleware('role:admin')->group(function () {
-        Route::middleware('can:users.manage')->group(function () {
-            Route::apiResource('users', UserController::class)
-                ->except('destroy');
+    /*
+    |----------------------------------------------------------------------
+    | Admin access management
+    |----------------------------------------------------------------------
+    */
+
+    Route::middleware("role:admin")->group(function () {
+        Route::middleware("can:users.manage")->group(function () {
+            Route::apiResource("users", UserController::class)->except(
+                "destroy",
+            );
         });
 
-        Route::get(
-            '/location-assignments',
-            [LocationAssignmentController::class, 'index']
-        )->middleware('can:location-assignments.view');
+        Route::get("/location-assignments", [
+            LocationAssignmentController::class,
+            "index",
+        ])->middleware("can:location-assignments.view");
 
-        Route::post(
-            '/location-assignments',
-            [LocationAssignmentController::class, 'store']
-        )->middleware('can:location-assignments.manage');
+        Route::post("/location-assignments", [
+            LocationAssignmentController::class,
+            "store",
+        ])->middleware("can:location-assignments.manage");
 
-        Route::delete(
-            '/location-assignments/{locationAssignment}',
-            [LocationAssignmentController::class, 'destroy']
-        )->middleware('can:location-assignments.manage');
+        Route::delete("/location-assignments/{locationAssignment}", [
+            LocationAssignmentController::class,
+            "destroy",
+        ])->middleware("can:location-assignments.manage");
 
-        Route::prefix('admin')
-            ->middleware('can:permissions.manage')
+        Route::prefix("admin")
+            ->middleware("can:permissions.manage")
             ->group(function () {
-                Route::get(
-                    '/permissions',
-                    [UserPermissionController::class, 'index']
-                );
+                Route::get("/permissions", [
+                    UserPermissionController::class,
+                    "index",
+                ]);
 
-                Route::get(
-                    '/users/{user}/permissions',
-                    [UserPermissionController::class, 'show']
-                );
+                Route::get("/users/{user}/permissions", [
+                    UserPermissionController::class,
+                    "show",
+                ]);
 
-                Route::put(
-                    '/users/{user}/permissions',
-                    [UserPermissionController::class, 'update']
-                );
+                Route::put("/users/{user}/permissions", [
+                    UserPermissionController::class,
+                    "update",
+                ]);
             });
     });
 
+    /*
+    |----------------------------------------------------------------------
+    | Selection and filter options
+    |----------------------------------------------------------------------
+    |
+    | Keep static endpoints before apiResource endpoints so values such as
+    | "active" and "options" are not treated as model identifiers.
+    |
+    */
 
-    Route::get(
-        '/payment-methods/active',
-        [PaymentMethodController::class, 'active']
-    )->middleware('can:payment-methods.view');
+    Route::get("/payment-methods/active", [
+        PaymentMethodController::class,
+        "active",
+    ])->middleware("can:payment-methods.view");
 
-    Route::get(
-        '/tax-rates/active',
-        [TaxRateController::class, 'active']
-    )->middleware('can:tax-rates.view');
+    Route::get("/tax-rates/active", [
+        TaxRateController::class,
+        "active",
+    ])->middleware("can:tax-rates.view");
 
-    Route::get(
-        '/product-prices/current',
-        [ProductPriceController::class, 'current']
-    )->middleware('can:product-prices.view');
+    Route::get("/product-prices/current", [
+        ProductPriceController::class,
+        "current",
+    ])->middleware("can:product-prices.view");
 
-    Route::get(
-        '/product-prices/catalogue',
-        [ProductPriceController::class, 'catalogue']
-    )->middleware('can:product-prices.view');
+    Route::get("/product-prices/catalogue", [
+        ProductPriceController::class,
+        "catalogue",
+    ])->middleware("can:product-prices.view");
 
-    Route::get(
-        '/suppliers/active',
-        [SupplierController::class, 'active']
-    )->middleware('can:suppliers.view');
+    Route::get("/suppliers/active", [
+        SupplierController::class,
+        "active",
+    ])->middleware("can:suppliers.view");
 
-    Route::patch(
-        '/purchase-orders/{purchaseOrder}/confirm',
-        [PurchaseOrderController::class, 'confirm']
-    )->middleware('can:purchase-orders.manage');
+    Route::get("/products/filter-options", [
+        ProductController::class,
+        "filterOptions",
+    ])->middleware("can:products.view");
 
-    Route::patch(
-        '/purchase-orders/{purchaseOrder}/cancel',
-        [PurchaseOrderController::class, 'cancel']
-    )->middleware('can:purchase-orders.manage');
-
-    Route::get(
-        '/purchase-orders/{purchaseOrder}/pdf',
-        [PurchaseOrderController::class, 'pdf']
-    )->middleware('can:purchase-orders.view');
-
-    Route::apiResource('locations', LocationController::class)
-        ->except('destroy');
-
-    Route::apiResource('categories', CategoryController::class)
-        ->except('destroy');
-
-    Route::apiResource('brands', BrandController::class)
-        ->except('destroy');
-
-    Route::get('/products/filter-options',[ProductController::class, 'filterOptions']);
-    Route::apiResource('products', ProductController::class);
-
-    Route::apiResource(
-        'payment-methods',
-        PaymentMethodController::class
-    )->except('destroy');
-
-    Route::apiResource('tax-rates', TaxRateController::class)
-        ->except('destroy');
-
-    Route::patch(
-    '/purchase-orders/{purchaseOrder}/confirm',
-    [
-        PurchaseOrderController::class,
-        'confirm',
-    ]
-    )->middleware('can:purchase-orders.confirm');
-
-    Route::apiResource(
-        'product-prices',
-        ProductPriceController::class
-    )->except('destroy');
-
-    Route::apiResource('suppliers', SupplierController::class);
-
-    Route::apiResource(
-        'purchase-orders',
-        PurchaseOrderController::class
-    )->except('destroy');
-
-
-    Route::get(
-    '/location-stocks/options',
-    [
+    Route::get("/location-stocks/options", [
         LocationStockController::class,
-        'options',
-    ]
-    );
+        "options",
+    ])->middleware("can:location-stocks.manage");
 
-    Route::patch(
-    '/location-stocks/{locationStock}/minimum-quantity',
-    [
-        LocationStockController::class,
-        'updateMinimumQuantity',
-    ]
-    );
-
-
-    Route::apiResource(
-        'location-stocks',
-        LocationStockController::class
-    )->only([
-        'index',
-        'store',
-        'show',
-    ]);
-
-    Route::apiResource(
-        'stock-movements',
-        StockMovementController::class
-    )->only([
-        'index',
-        'store',
-        'show',
-    ]);
-
-    Route::get('/purchase-receipts/receivable-orders',
-        [
+    Route::get("/purchase-receipts/receivable-orders", [
         PurchaseReceiptController::class,
-        'receivableOrders',
-        ]
-        );
+        "receivableOrders",
+    ])->middleware("can:purchase-receipts.manage");
 
-    Route::patch('/purchase-receipts/{purchaseReceipt}/validate',
-        [
-        PurchaseReceiptController::class,
-        'validateReceipt',
-        ]
-        );
+    Route::get("/customers/active", [CustomerController::class, "active"]);
 
-    Route::apiResource('purchase-receipts',PurchaseReceiptController::class);
+    Route::get("/sales/options", [
+        SaleController::class,
+        "options",
+    ])->middleware("can:sales.manage");
 
     /*
-|--------------------------------------------------------------------------
-| Sales special routes
-|--------------------------------------------------------------------------
-*/
+    |----------------------------------------------------------------------
+    | Purchase-order actions
+    |----------------------------------------------------------------------
+    */
 
-Route::get(
-    '/customers/active',
-    [
-        CustomerController::class,
-        'active',
-    ]
-);
+    Route::patch("/purchase-orders/{purchaseOrder}/confirm", [
+        PurchaseOrderController::class,
+        "confirm",
+    ])->middleware("can:purchase-orders.confirm");
 
-Route::get(
-    '/sales/options',
-    [
+    Route::patch("/purchase-orders/{purchaseOrder}/cancel", [
+        PurchaseOrderController::class,
+        "cancel",
+    ])->middleware("can:purchase-orders.cancel");
+
+    Route::get("/purchase-orders/{purchaseOrder}/pdf", [
+        PurchaseOrderController::class,
+        "pdf",
+    ])->middleware("can:purchase-orders.view");
+
+    /*
+    |----------------------------------------------------------------------
+    | Location-stock and purchase-receipt actions
+    |----------------------------------------------------------------------
+    */
+
+    Route::patch("/location-stocks/{locationStock}/minimum-quantity", [
+        LocationStockController::class,
+        "updateMinimumQuantity",
+    ])->middleware("can:location-stocks.manage");
+
+    Route::patch("/purchase-receipts/{purchaseReceipt}/validate", [
+        PurchaseReceiptController::class,
+        "validateReceipt",
+    ])->middleware("can:purchase-receipts.manage");
+
+    /*
+    |----------------------------------------------------------------------
+    | Sale actions and remaining payments
+    |----------------------------------------------------------------------
+    */
+
+    Route::patch("/sales/{sale}/confirm", [
         SaleController::class,
-        'options',
-    ]
-);
+        "confirm",
+    ])->middleware("can:sales.confirm");
 
-Route::patch(
-    '/sales/{sale}/confirm',
-    [
+    Route::patch("/sales/{sale}/cancel", [
         SaleController::class,
-        'confirm',
-    ]
-);
+        "cancel",
+    ])->middleware("can:sales.cancel");
 
-Route::patch(
-    '/sales/{sale}/cancel',
-    [
-        SaleController::class,
-        'cancel',
-    ]
-);
+    Route::get("/sale-balances", [SalePaymentController::class, "outstanding"]);
 
-Route::get(
-    '/sales/{sale}/payments',
-    [
+    Route::get("/sales/{sale}/payments", [
         SalePaymentController::class,
-        'index',
-    ]
+        "index",
+    ]);
+
+    Route::post("/sales/{sale}/payments", [
+        SalePaymentController::class,
+        "store",
+    ]);
+
+    Route::get("/fournisseur/my-account", [
+        FournisseurController::class,
+        "myAccount",
+    ]);
+
+    /*
+    |----------------------------------------------------------------------
+    | Business resources
+    |----------------------------------------------------------------------
+    |
+    | Most resource permissions are defined by HasMiddleware inside their
+    | controllers. Every route in this group is also protected by Sanctum.
+    |
+    */
+
+    Route::apiResource("locations", LocationController::class)->except(
+        "destroy",
+    );
+
+    Route::apiResource("categories", CategoryController::class)->except(
+        "destroy",
+    );
+
+    Route::apiResource("brands", BrandController::class)->except("destroy");
+
+    Route::apiResource("products", ProductController::class);
+
+    Route::apiResource(
+        "payment-methods",
+        PaymentMethodController::class,
+    )->except("destroy");
+
+    Route::apiResource("tax-rates", TaxRateController::class)->except(
+        "destroy",
+    );
+
+    Route::apiResource("product-prices", ProductPriceController::class)->except(
+        "destroy",
+    );
+
+    Route::apiResource("suppliers", SupplierController::class);
+
+    Route::apiResource(
+        "purchase-orders",
+        PurchaseOrderController::class,
+    )->except("destroy");
+
+    Route::apiResource("location-stocks", LocationStockController::class)->only(
+        ["index", "store", "show"],
+    );
+
+    Route::apiResource("stock-movements", StockMovementController::class)->only(
+        ["index", "store", "show"],
+    );
+
+    Route::apiResource(
+        "purchase-receipts",
+        PurchaseReceiptController::class,
+    )->except("destroy");
+
+    Route::apiResource("customers", CustomerController::class)->only([
+        "index",
+        "store",
+        "show",
+        "update",
+    ]);
+
+    Route::apiResource("fournisseurs", FournisseurController::class)->only([
+        "index",
+        "store",
+        "show",
+        "update",
+    ]);
+
+    Route::apiResource("sales", SaleController::class)->only([
+        "index",
+        "store",
+        "show",
+        "update",
+    ]);
+
+    Route::get(
+    '/sale-returns/options',
+    [SaleReturnController::class, 'options']
+);
+
+Route::patch(
+    '/sale-returns/{saleReturn}/validate',
+    [SaleReturnController::class, 'validateReturn']
+);
+
+Route::patch(
+    '/sale-returns/{saleReturn}/cancel',
+    [SaleReturnController::class, 'cancel']
+);
+
+Route::get(
+    '/sale-returns/{saleReturn}/refunds',
+    [SaleRefundController::class, 'index']
 );
 
 Route::post(
-    '/sales/{sale}/payments',
-    [
-        SalePaymentController::class,
-        'store',
-    ]
+    '/sale-returns/{saleReturn}/refunds',
+    [SaleRefundController::class, 'store']
 );
 
-/*
-|--------------------------------------------------------------------------
-| Sales resources
-|--------------------------------------------------------------------------
-*/
-
 Route::apiResource(
-    'customers',
-    CustomerController::class
+    'sale-returns',
+    SaleReturnController::class
 )->only([
     'index',
     'store',
@@ -286,28 +332,13 @@ Route::apiResource(
     'update',
 ]);
 
-        Route::get(
-        '/fournisseur/my-account',
-        [FournisseurController::class, 'myAccount']
-    );
+Route::get(
+    '/dashboard/options',
+    [DashboardController::class, 'options']
+)->middleware('can:dashboard.view');
 
-    Route::apiResource(
-        'fournisseurs',
-        FournisseurController::class
-    )->only([
-        'index',
-        'store',
-        'show',
-        'update',
-    ]);
-
-Route::apiResource(
-    'sales',
-    SaleController::class
-)->only([
-    'index',
-    'store',
-    'show',
-    'update',
-]);
+Route::get(
+    '/dashboard/analytics',
+    [DashboardController::class, 'analytics']
+)->middleware('can:dashboard.view');
 });
