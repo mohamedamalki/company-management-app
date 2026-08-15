@@ -54,4 +54,11 @@ class Location extends Model
         Sale::class
     );
     }
+
+    public function expenses(): HasMany
+{
+    return $this->hasMany(
+        Expense::class
+    );
+}
 }

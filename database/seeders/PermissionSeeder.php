@@ -78,6 +78,13 @@ class PermissionSeeder extends Seeder
             'sale-returns.view',
             'sale-returns.manage',
             'dashboard.view',
+            'expenses.view',
+            'expenses.manage',
+            'expenses.approve',
+            'expenses.pay',
+
+            'expense-categories.view',
+            'expense-categories.manage',
         ];
 
         foreach ($permissions as $permission) {

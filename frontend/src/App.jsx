@@ -82,6 +82,16 @@ import SaleReturnDetails from "./pages/saleReturns/SaleReturnDetails";
 import SaleReturnsCreate from "./pages/saleReturns/SaleReturnsCreate";
 import SaleReturnsUpdate from "./pages/saleReturns/SaleReturnsUpdate";
 
+import ExpenseCategoriesPage from "./pages/expenseCategories/ExpenseCategoriesPage";
+import ExpenseCategoriesCreate from "./pages/expenseCategories/ExpenseCategoriesCreate";
+import ExpenseCategoriesUpdate from "./pages/expenseCategories/ExpenseCategoriesUpdate";
+
+import ExpensesPage from "./pages/expenses/ExpensesPage";
+import ExpensesCreate from "./pages/expenses/ExpensesCreate";
+import ExpensesUpdate from "./pages/expenses/ExpensesUpdate";
+import ExpenseDetails from "./pages/expenses/ExpenseDetails";
+import ExpensePaymentsPage from "./pages/expenses/ExpensePaymentsPage";
+
 function App() {
   return (
     <Routes>
@@ -376,6 +386,47 @@ function App() {
 <Route element={<PermissionRoute permission="sale-returns.manage" />}>
   <Route path="sale-returns/create" element={<SaleReturnsCreate />} />
   <Route path="sale-returns/:id/edit" element={<SaleReturnsUpdate />} />
+</Route>
+
+        {/* Expense categories */}
+<Route
+  element={<PermissionRoute permission="expense-categories.view" />}
+>
+  <Route
+    path="expense-categories"
+    element={<ExpenseCategoriesPage />}
+  />
+</Route>
+
+<Route
+  element={<PermissionRoute permission="expense-categories.manage" />}
+>
+  <Route
+    path="expense-categories/create"
+    element={<ExpenseCategoriesCreate />}
+  />
+  <Route
+    path="expense-categories/:id/edit"
+    element={<ExpenseCategoriesUpdate />}
+  />
+</Route>
+
+{/* Expenses */}
+<Route element={<PermissionRoute permission="expenses.view" />}>
+  <Route path="expenses" element={<ExpensesPage />} />
+  <Route path="expenses/:id" element={<ExpenseDetails />} />
+</Route>
+
+<Route element={<PermissionRoute permission="expenses.manage" />}>
+  <Route path="expenses/create" element={<ExpensesCreate />} />
+  <Route path="expenses/:id/edit" element={<ExpensesUpdate />} />
+</Route>
+
+<Route element={<PermissionRoute permission="expenses.pay" />}>
+  <Route
+    path="expenses/:id/payments"
+    element={<ExpensePaymentsPage />}
+  />
 </Route>
 
           {/* Unknown authenticated route */}

@@ -127,4 +127,36 @@ public function receivedSalePayments(): HasMany
         'received_by'
     );
 }
+
+    public function createdExpenses(): HasMany
+{
+    return $this->hasMany(
+        Expense::class,
+        'created_by'
+    );
+}
+
+public function approvedExpenses(): HasMany
+{
+    return $this->hasMany(
+        Expense::class,
+        'approved_by'
+    );
+}
+
+public function cancelledExpenses(): HasMany
+{
+    return $this->hasMany(
+        Expense::class,
+        'cancelled_by'
+    );
+}
+
+public function paidExpenses(): HasMany
+{
+    return $this->hasMany(
+        ExpensePayment::class,
+        'paid_by'
+    );
+}
 }

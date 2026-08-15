@@ -21,7 +21,9 @@ import {
     X,
     Handshake,
     HandCoins,
-    RotateCcw
+    RotateCcw,
+    ReceiptText,
+    FolderCog
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import useAuth from "../context/useAuth";
@@ -166,6 +168,23 @@ const navigationSections = [
                 permission: "sale-returns.view",
             },
         ],
+    },
+    {
+        label : "Expenses",
+        items : [
+            {
+                label: "Expenses",
+                to: "/app/expenses",
+                icon: ReceiptText,
+                permission: "expenses.view",
+            },
+            {
+                label: "Expense categories",
+                to: "/app/expense-categories",
+                icon: FolderCog,
+                permission: "expense-categories.view",
+            },
+        ]
     },
     {
         label: "Settings",

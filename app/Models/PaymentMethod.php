@@ -20,4 +20,11 @@ class PaymentMethod extends Model
         SalePayment::class
     );
     }
+
+    public function expensePayments(): HasMany
+{
+    return $this->hasMany(
+        ExpensePayment::class
+    );
+}
 }

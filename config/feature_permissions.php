@@ -259,5 +259,37 @@ return [
                 'dashboard.view' => 'View dashboard',
             ],
         ],
+
+        'expenses' => [
+    'label' => 'Expenses',
+    'assignable' => true,
+
+    'permissions' => [
+        'expenses.view' =>
+            'View expenses',
+
+        'expenses.manage' =>
+            'Create and update expenses',
+
+        'expenses.approve' =>
+            'Approve and cancel expenses',
+
+        'expenses.pay' =>
+            'Record expense payments',
+    ],
+],
+
+'expense-categories' => [
+    'label' => 'Expense categories',
+    'assignable' => true,
+
+    'permissions' => [
+        'expense-categories.view' =>
+            'View expense categories',
+
+        'expense-categories.manage' =>
+            'Manage expense categories',
+    ],
+],
     ],
 ];

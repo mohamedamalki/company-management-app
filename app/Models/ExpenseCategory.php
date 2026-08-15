@@ -2,23 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Supplier extends Model
+class ExpenseCategory extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'name',
         'code',
-        'contact_name',
-        'email',
-        'phone',
-        'address',
-        'ice',
+        'description',
         'is_active',
     ];
 
@@ -29,17 +25,19 @@ class Supplier extends Model
         ];
     }
 
-    public function purchaseOrders(): HasMany
+    public function expenses(): HasMany
     {
         return $this->hasMany(
-            PurchaseOrder::class
+            Expense::class
         );
     }
 
-    public function expenses(): HasMany
-{
-    return $this->hasMany(
-        Expense::class
-    );
-}
+    public function scopeActive(
+        Builder $query
+    ): Builder {
+        return $query->where(
+            'is_active',
+            true
+        );
+    }
 }

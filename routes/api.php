@@ -5,6 +5,9 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ExpenseCategoryController;
+use App\Http\Controllers\Api\ExpenseController;
+use App\Http\Controllers\Api\ExpensePaymentController;
 use App\Http\Controllers\Api\FournisseurController;
 use App\Http\Controllers\Api\LocationAssignmentController;
 use App\Http\Controllers\Api\LocationController;
@@ -341,4 +344,37 @@ Route::get(
     '/dashboard/analytics',
     [DashboardController::class, 'analytics']
 )->middleware('can:dashboard.view');
+Route::get("/expenses/options", [ExpenseController::class, "options"]);
+
+Route::patch("/expenses/{expense}/approve", [
+    ExpenseController::class,
+    "approve",
+]);
+
+Route::patch("/expenses/{expense}/cancel", [
+    ExpenseController::class,
+    "cancel",
+]);
+
+Route::get("/expenses/{expense}/payments", [
+    ExpensePaymentController::class,
+    "index",
+]);
+
+Route::post("/expenses/{expense}/payments", [
+    ExpensePaymentController::class,
+    "store",
+]);
+
+Route::apiResource(
+    "expense-categories",
+    ExpenseCategoryController::class,
+)->only(["index", "store", "show", "update"]);
+
+Route::apiResource("expenses", ExpenseController::class)->only([
+    "index",
+    "store",
+    "show",
+    "update",
+]);
 });
