@@ -12,6 +12,14 @@ function extractError(error, fallback) {
     : (error.response?.data?.message ?? fallback);
 }
 
+function formatDueDay(day) {
+  if (!day) return "-";
+  const suffixes = ["th", "st", "nd", "rd"];
+  const value = day % 100;
+  const suffix = suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0];
+  return `${day}${suffix} of month`;
+}
+
 function ExpenseCategoriesPage() {
   const routeLocation = useLocation();
   const { hasPermission } = useAuth();
@@ -123,11 +131,12 @@ function ExpenseCategoriesPage() {
 
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px] text-left">
+          <table className="w-full min-w-[900px] text-left">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
                 <th className="px-5 py-4">Category</th>
                 <th className="px-5 py-4">Description</th>
+                <th className="px-5 py-4">Due date</th>
                 <th className="px-5 py-4">Expenses</th>
                 <th className="px-5 py-4">Status</th>
                 <th className="px-5 py-4 text-right">Actions</th>
@@ -137,7 +146,7 @@ function ExpenseCategoriesPage() {
               {loading ? (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="6"
                     className="px-5 py-14 text-center text-slate-500"
                   >
                     Loading expense categories...
@@ -146,7 +155,7 @@ function ExpenseCategoriesPage() {
               ) : categories.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="6"
                     className="px-5 py-14 text-center text-slate-500"
                   >
                     No expense categories found.
@@ -167,6 +176,9 @@ function ExpenseCategoriesPage() {
                       <p className="line-clamp-2">
                         {category.description || "-"}
                       </p>
+                    </td>
+                    <td className="px-5 py-4 text-sm font-semibold text-slate-700">
+                      {formatDueDay(category.due_date)}
                     </td>
                     <td className="px-5 py-4 text-sm font-semibold text-slate-700">
                       {category.expenses_count ?? 0}

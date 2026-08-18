@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\TaxRateController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserPermissionController;
+use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -377,4 +378,10 @@ Route::apiResource("expenses", ExpenseController::class)->only([
     "show",
     "update",
 ]);
+    Route::post('/expenses/{expense}/mark-paid', [ExpenseController::class, 'markPaid']);
+
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 });

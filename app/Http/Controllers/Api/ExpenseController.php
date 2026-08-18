@@ -232,12 +232,6 @@ class ExpenseController extends Controller implements HasMiddleware
 
                     "issue_date" => $data["issue_date"],
 
-                    "due_date" => $data["due_date"] ?? null,
-
-                    "period_start" => $data["period_start"] ?? null,
-
-                    "period_end" => $data["period_end"] ?? null,
-
                     ...$totals,
 
                     "paid_amount" => 0,
@@ -366,20 +360,6 @@ class ExpenseController extends Controller implements HasMiddleware
                         : $expense->bill_reference,
 
                     "issue_date" => $data["issue_date"] ?? $expense->issue_date,
-
-                    "due_date" => array_key_exists("due_date", $data)
-                        ? $data["due_date"]
-                        : $expense->due_date,
-
-                    "period_start" => array_key_exists("period_start", $data)
-                        ? $data["period_start"]
-                        : $expense->period_start,
-
-                    "period_end" => array_key_exists("period_end", $data)
-                        ? $data["period_end"]
-                        : $expense->period_end,
-
-                    ...$totals,
 
                     "notes" => array_key_exists("notes", $data)
                         ? $data["notes"]
@@ -536,6 +516,15 @@ class ExpenseController extends Controller implements HasMiddleware
                     "The selected expense category is invalid or inactive.",
             ]);
         }
+    }
+    public function markPaid(Expense $expense)
+    {
+        $expense->update([
+            'payment_status' => 'paid',
+            'paid_at' => now(),
+        ]);
+
+        return response()->json($expense);
     }
 
     private function ensureLocationAccess(

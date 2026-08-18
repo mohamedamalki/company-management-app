@@ -25,6 +25,10 @@ class StoreExpenseCategoryRequest extends FormRequest
             $data["code"] = strtoupper(trim((string) $this->input("code")));
         }
 
+        if ($this->has("due_date")) {
+            $data["due_date"] = trim( $this->input("due_date"));
+        }
+
         if ($this->has("description")) {
             $description = trim((string) $this->input("description"));
 
@@ -51,6 +55,8 @@ class StoreExpenseCategoryRequest extends FormRequest
                 'regex:/^[A-Z0-9_-]+$/',
                 Rule::unique("expense_categories", "code"),
             ],
+
+            "due_date" => ["required"],
 
             "description" => ["nullable", "string", "max:2000"],
 

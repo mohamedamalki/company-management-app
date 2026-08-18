@@ -42,9 +42,6 @@ class Expense extends Model
         'title',
         'bill_reference',
         'issue_date',
-        'due_date',
-        'period_start',
-        'period_end',
         'amount_ht',
         'tax_rate',
         'tax_amount',
@@ -68,10 +65,6 @@ class Expense extends Model
     {
         return [
             'issue_date' => 'date',
-            'due_date' => 'date',
-            'period_start' => 'date',
-            'period_end' => 'date',
-
             'amount_ht' => 'decimal:2',
             'tax_rate' => 'decimal:4',
             'tax_amount' => 'decimal:2',

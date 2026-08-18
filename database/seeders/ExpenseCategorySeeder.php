@@ -13,38 +13,27 @@ class ExpenseCategorySeeder extends Seeder
             [
                 'name' => 'Electricity',
                 'code' => 'ELECTRICITY',
+                'due_date' => '17'
             ],
             [
                 'name' => 'Water',
                 'code' => 'WATER',
+                'due_date' => '17'
             ],
             [
                 'name' => 'Rent',
                 'code' => 'RENT',
+                'due_date' => '17'
             ],
             [
                 'name' => 'Salaries',
                 'code' => 'SALARIES',
+                'due_date' => '17'
             ],
             [
                 'name' => 'Internet',
                 'code' => 'INTERNET',
-            ],
-            [
-                'name' => 'Maintenance',
-                'code' => 'MAINTENANCE',
-            ],
-            [
-                'name' => 'Transport',
-                'code' => 'TRANSPORT',
-            ],
-            [
-                'name' => 'Taxes',
-                'code' => 'TAXES',
-            ],
-            [
-                'name' => 'Other',
-                'code' => 'OTHER',
+                'due_date' => '17'
             ],
         ];
 
@@ -55,8 +44,10 @@ class ExpenseCategorySeeder extends Seeder
                 ],
                 [
                     'name' => $category['name'],
+                    'due_date' => $category['due_date'],
                     'is_active' => true,
                 ]
+
             );
         }
     }

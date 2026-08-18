@@ -14,6 +14,7 @@ class ExpenseCategory extends Model
     protected $fillable = [
         'name',
         'code',
+        'due_date',
         'description',
         'is_active',
     ];

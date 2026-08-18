@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\ExpenseCategory;
+use BcMath\Number;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,6 +24,10 @@ class UpdateExpenseCategoryRequest extends FormRequest
 
         if ($this->has("code")) {
             $data["code"] = strtoupper(trim((string) $this->input("code")));
+        }
+
+        if ($this->has("due_date")) {
+            $data["due_date"] = trim($this->input("due_date"));
         }
 
         if ($this->has("description")) {
@@ -56,6 +61,8 @@ class UpdateExpenseCategoryRequest extends FormRequest
                 'regex:/^[A-Z0-9_-]+$/',
                 Rule::unique("expense_categories", "code")->ignore($category),
             ],
+
+            "due_date" => ["required"],
 
             "description" => ["sometimes", "nullable", "string", "max:2000"],
 

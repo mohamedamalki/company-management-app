@@ -101,22 +101,6 @@ return new class extends Migration
                     'issue_date'
                 );
 
-                $table->date(
-                    'due_date'
-                )->nullable();
-
-                /*
-                 * Useful for bills such as:
-                 * Electricity for August 2026.
-                 */
-                $table->date(
-                    'period_start'
-                )->nullable();
-
-                $table->date(
-                    'period_end'
-                )->nullable();
-
                 $table->decimal(
                     'amount_ht',
                     15,
@@ -211,10 +195,9 @@ return new class extends Migration
 
                 $table->index(
                     [
-                        'due_date',
                         'payment_status',
                     ],
-                    'expenses_due_payment_index'
+                    'expenses_payment_status_index'
                 );
             }
         );

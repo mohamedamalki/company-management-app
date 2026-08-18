@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import NotificationBell from "./NotificationBell";
 
 function getInitials(name = "Admin User") {
     return name
@@ -93,6 +94,9 @@ export default function Navbar({ user, onMenuClick }) {
                         <Search className="h-5 w-5" />
                     </button>
 
+                    <div className="flex items-center gap-3">
+                        <NotificationBell />
+                    </div>
                     <div className="hidden h-8 w-px bg-slate-200 sm:block" />
 
                     <div ref={profileMenuRef} className="relative">

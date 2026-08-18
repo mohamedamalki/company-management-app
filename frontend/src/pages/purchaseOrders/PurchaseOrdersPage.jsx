@@ -593,8 +593,7 @@ function PurchaseOrdersPage() {
                                                     )}
 
                                                 {canConfirm &&
-                                                    order.status ===
-                                                        "pending" && (
+                                                    order.status === "pending" || order.status === "draft"   && (
                                                         <button
                                                             type="button"
                                                             onClick={() =>

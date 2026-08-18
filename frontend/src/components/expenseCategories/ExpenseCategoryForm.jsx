@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 const emptyCategory = {
   name: "",
   code: "",
+  due_date : "" ,
   description: "",
   is_active: true,
 };
@@ -45,6 +46,7 @@ function ExpenseCategoryForm({
     onSubmit({
       name: formData.name.trim(),
       code: formData.code.trim().toUpperCase(),
+      due_date: formData.due_date.trim(),
       description: formData.description.trim() || null,
       is_active: Boolean(formData.is_active),
     });
@@ -52,6 +54,7 @@ function ExpenseCategoryForm({
 
   const inputClass =
     "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 disabled:cursor-not-allowed disabled:bg-slate-100";
+  const labelClass = "mb-1.5 block text-sm font-semibold text-slate-700";
 
   return (
     <form
@@ -124,6 +127,25 @@ function ExpenseCategoryForm({
               required
             />
           </div>
+        </div>
+        <div>
+            <div>
+              <label htmlFor="due_date" className={labelClass}>
+                Due date
+              </label>
+              <input
+                id="due_date"
+                type="number"
+                name="due_date"
+                min="1"
+                max="31"
+                value={formData.due_date}
+                onChange={handleChange}
+                disabled={saving}
+                className={inputClass}
+                required
+              />
+            </div>
         </div>
 
         <div>

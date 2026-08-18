@@ -31,9 +31,6 @@ class StoreExpenseRequest extends FormRequest
                 "location_id",
                 "supplier_id",
                 "tax_rate_id",
-                "due_date",
-                "period_start",
-                "period_end",
             ]
             as $field
         ) {
@@ -85,25 +82,6 @@ class StoreExpenseRequest extends FormRequest
             "bill_reference" => ["nullable", "string", "max:100"],
 
             "issue_date" => ["required", "date_format:Y-m-d"],
-
-            "due_date" => [
-                "nullable",
-                "date_format:Y-m-d",
-                "after_or_equal:issue_date",
-            ],
-
-            "period_start" => [
-                "nullable",
-                "required_with:period_end",
-                "date_format:Y-m-d",
-            ],
-
-            "period_end" => [
-                "nullable",
-                "required_with:period_start",
-                "date_format:Y-m-d",
-                "after_or_equal:period_start",
-            ],
 
             "amount_ht" => ["required", "numeric", "gt:0", "decimal:0,2"],
 

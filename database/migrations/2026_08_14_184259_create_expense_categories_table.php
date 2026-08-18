@@ -22,6 +22,10 @@ return new class extends Migration
                     50
                 )->unique();
 
+                $table->unsignedTinyInteger(
+                    'due_date'
+                );
+
                 $table->text(
                     'description'
                 )->nullable();

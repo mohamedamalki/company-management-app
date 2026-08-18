@@ -16,14 +16,10 @@ const today = new Date().toISOString().slice(0, 10);
 const emptyExpense = {
   expense_category_id: "",
   location_id: "",
-  supplier_id: "",
   tax_rate_id: "",
   title: "",
   bill_reference: "",
   issue_date: today,
-  due_date: "",
-  period_start: "",
-  period_end: "",
   amount_ht: "",
   notes: "",
   document: null,
@@ -36,14 +32,10 @@ function normalizeInitialData(initialData) {
     ...initialData,
     expense_category_id: initialData?.expense_category_id ?? "",
     location_id: initialData?.location_id ?? "",
-    supplier_id: initialData?.supplier_id ?? "",
     tax_rate_id: initialData?.tax_rate_id ?? "",
     title: initialData?.title ?? "",
     bill_reference: initialData?.bill_reference ?? "",
     issue_date: toDateInput(initialData?.issue_date) || today,
-    due_date: toDateInput(initialData?.due_date),
-    period_start: toDateInput(initialData?.period_start),
-    period_end: toDateInput(initialData?.period_end),
     amount_ht: initialData?.amount_ht ?? "",
     notes: initialData?.notes ?? "",
     document: null,
@@ -81,7 +73,6 @@ function ExpenseForm({
         setOptions({
           locations: Array.isArray(data.locations) ? data.locations : [],
           categories: Array.isArray(data.categories) ? data.categories : [],
-          suppliers: Array.isArray(data.suppliers) ? data.suppliers : [],
           tax_rates: Array.isArray(data.tax_rates) ? data.tax_rates : [],
         });
         setOptionsError("");
@@ -229,27 +220,6 @@ function ExpenseForm({
                 Company-wide is available to administrators only.
               </p>
             </div>
-
-            <div>
-              <label htmlFor="supplier_id" className={labelClass}>
-                Supplier
-              </label>
-              <select
-                id="supplier_id"
-                name="supplier_id"
-                value={formData.supplier_id}
-                onChange={handleChange}
-                disabled={saving || optionsLoading}
-                className={inputClass}
-              >
-                <option value="">No supplier</option>
-                {options.suppliers.map((supplier) => (
-                  <option key={supplier.id} value={supplier.id}>
-                    {supplier.name} — {supplier.code}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
         </section>
 
@@ -310,50 +280,6 @@ function ExpenseForm({
                 disabled={saving}
                 className={inputClass}
                 required
-              />
-            </div>
-            <div>
-              <label htmlFor="due_date" className={labelClass}>
-                Due date
-              </label>
-              <input
-                id="due_date"
-                type="date"
-                name="due_date"
-                min={formData.issue_date || undefined}
-                value={formData.due_date}
-                onChange={handleChange}
-                disabled={saving}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label htmlFor="period_start" className={labelClass}>
-                Period start
-              </label>
-              <input
-                id="period_start"
-                type="date"
-                name="period_start"
-                value={formData.period_start}
-                onChange={handleChange}
-                disabled={saving}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label htmlFor="period_end" className={labelClass}>
-                Period end
-              </label>
-              <input
-                id="period_end"
-                type="date"
-                name="period_end"
-                min={formData.period_start || undefined}
-                value={formData.period_end}
-                onChange={handleChange}
-                disabled={saving}
-                className={inputClass}
               />
             </div>
           </div>
