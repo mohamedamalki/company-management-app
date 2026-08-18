@@ -184,6 +184,18 @@ const navigationSections = [
                 icon: FolderCog,
                 permission: "expense-categories.view",
             },
+            {
+                label: "Employees",
+                to: "/app/employees",
+                icon: Users,
+                permission: "employees.view",
+            },
+            {
+                label: "Salaries",
+                to: "/app/salaries",
+                icon: WalletCards,
+                permission: "salaries.view",
+            },
         ]
     },
     {

@@ -93,6 +93,12 @@ class StoreExpenseRequest extends FormRequest
                 "mimes:pdf,jpg,jpeg,png,webp",
                 "max:5120",
             ],
+
+            'salary_id' => [
+                'nullable',
+                'integer',
+                'exists:salaries,id',
+            ],
         ];
     }
 }

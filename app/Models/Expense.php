@@ -36,6 +36,7 @@ class Expense extends Model
         'location_id',
         'supplier_id',
         'tax_rate_id',
+        'salary_id',
         'created_by',
         'approved_by',
         'cancelled_by',
@@ -134,6 +135,11 @@ class Expense extends Model
         return $this->hasMany(
             ExpensePayment::class
         );
+    }
+
+    public function salary()
+    {
+        return $this->belongsTo(Salary::class);
     }
 
     public function getRemainingAmountAttribute(): float

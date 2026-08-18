@@ -88,6 +88,11 @@ class UpdateExpenseRequest extends FormRequest
                     fn($query) => $query->where("status", "active"),
                 ),
             ],
+            'salary_id' => [
+                'nullable',
+                'integer',
+                'exists:salaries,id',
+            ],
 
             "title" => ["sometimes", "required", "string", "max:255"],
 

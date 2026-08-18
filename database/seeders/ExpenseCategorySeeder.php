@@ -26,11 +26,6 @@ class ExpenseCategorySeeder extends Seeder
                 'due_date' => '17'
             ],
             [
-                'name' => 'Salaries',
-                'code' => 'SALARIES',
-                'due_date' => '17'
-            ],
-            [
                 'name' => 'Internet',
                 'code' => 'INTERNET',
                 'due_date' => '17'

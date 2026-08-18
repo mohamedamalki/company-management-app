@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\ExpenseCategoryController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\ExpensePaymentController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\Api\TaxRateController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserPermissionController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\SalaryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -384,4 +386,7 @@ Route::apiResource("expenses", ExpenseController::class)->only([
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+
+    Route::apiResource('employees', EmployeeController::class);
+    Route::apiResource('salaries', SalaryController::class);
 });

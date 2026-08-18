@@ -91,6 +91,12 @@ import ExpensesCreate from "./pages/expenses/ExpensesCreate";
 import ExpensesUpdate from "./pages/expenses/ExpensesUpdate";
 import ExpenseDetails from "./pages/expenses/ExpenseDetails";
 import ExpensePaymentsPage from "./pages/expenses/ExpensePaymentsPage";
+import EmployeesPage from "./pages/employees/EmployeesPage";
+import EmployeesCreate from "./pages/employees/EmployeesCreate";
+import EmployeesUpdate from "./pages/employees/EmployeesUpdate";
+import SalariesPage from "./pages/salaries/SalariesPage";
+import SalariesCreate from "./pages/salaries/SalariesCreate";
+import SalariesUpdate from "./pages/salaries/SalariesUpdate";
 
 function App() {
   return (
@@ -428,7 +434,44 @@ function App() {
     element={<ExpensePaymentsPage />}
   />
 </Route>
+        {/* Employees */}
+<Route element={<PermissionRoute permission="employees.view" />}>
+    <Route
+        path="employees"
+        element={<EmployeesPage />}
+    />
+</Route>
 
+<Route element={<PermissionRoute permission="employees.manage" />}>
+    <Route
+        path="employees/create"
+        element={<EmployeesCreate />}
+    />
+
+    <Route
+        path="employees/:id/edit"
+        element={<EmployeesUpdate />}
+    />
+</Route>
+        {/* salaries */}
+<Route element={<PermissionRoute permission="salaries.view" />}>
+    <Route
+        path="salaries"
+        element={<SalariesPage />}
+    />
+</Route>
+
+<Route element={<PermissionRoute permission="salaries.manage" />}>
+    <Route
+        path="salaries/create"
+        element={<SalariesCreate />}
+    />
+
+    <Route
+        path="salaries/:id/edit"
+        element={<SalariesUpdate />}
+    />
+</Route>
           {/* Unknown authenticated route */}
           <Route path="*" element={<NotFoundPage />} />
         </Route>
