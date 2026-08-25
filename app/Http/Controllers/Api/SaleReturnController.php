@@ -12,6 +12,7 @@ use App\Models\SaleItem;
 use App\Models\SaleReturn;
 use App\Models\SaleReturnItem;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -612,6 +613,22 @@ public function options(
             "data" => $this->loadReturn($saleReturn),
         ]);
     }
+        public function downloadPdf(SaleReturn $saleReturn)
+{
+    $saleReturn->load([
+        'sale.customer',
+        'location',
+        'items.product',
+    ]);
+
+    $pdf = Pdf::loadView('pdf.sale-return', [
+        'saleReturn' => $saleReturn,
+    ])->setPaper('a4', 'portrait');
+
+    return $pdf->download(
+        "sale-return-{$saleReturn->return_number}.pdf"
+    );
+}
 
     private function replaceItemsAndTotals(
         SaleReturn $saleReturn,

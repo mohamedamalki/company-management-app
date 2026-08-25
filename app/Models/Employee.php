@@ -14,6 +14,7 @@ class Employee extends Model
         'first_name',
         'last_name',
         'email',
+        'location_id',
         'position',
         'phone',
     ];
@@ -24,5 +25,8 @@ class Employee extends Model
     public function salaries(): HasMany
     {
         return $this->hasMany(Salary::class);
+    }
+    public function location() {
+        return $this->belongsTo(Location::class);
     }
 }

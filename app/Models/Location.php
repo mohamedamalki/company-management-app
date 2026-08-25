@@ -61,4 +61,7 @@ class Location extends Model
         Expense::class
     );
 }
+    public function employees() {
+        return $this->hasMany(Employee::class);
+    }
 }

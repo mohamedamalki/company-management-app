@@ -42,63 +42,125 @@ class SaleController extends Controller implements HasMiddleware
     }
 
     public function index(Request $request): JsonResponse
-    {
-        $perPage = min(max($request->integer("per_page", 15), 1), 100);
+{
+    $filters = $request->validate([
+        'status' => [
+            'nullable',
+            'in:draft,confirmed,cancelled',
+        ],
 
-        $query = Sale::query()
-            ->with([
-                "customer:id,code,name,category",
-                "location:id,name,code",
-                "creator:id,name",
-                "confirmedBy:id,name",
-            ])
-            ->withCount("items");
+        'payment_status' => [
+            'nullable',
+            'in:unpaid,partially_paid,paid',
+        ],
 
-        $this->applyLocationScope($query, $request->user());
+        'search' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
 
-        $sales = $query
-            ->when(
-                $request->filled("status"),
-                fn(Builder $query) => $query->where(
-                    "status",
-                    $request->input("status"),
-                ),
-            )
-            ->when(
-                $request->filled("payment_status"),
-                fn(Builder $query) => $query->where(
-                    "payment_status",
-                    $request->input("payment_status"),
-                ),
-            )
-            ->when($request->filled("search"), function (Builder $query) use (
-                $request,
+        'date_from' => [
+            'nullable',
+            'date_format:Y-m-d',
+        ],
+
+        'date_to' => [
+            'nullable',
+            'date_format:Y-m-d',
+            'after_or_equal:date_from',
+        ],
+    ]);
+
+    $perPage = min(
+        max($request->integer('per_page', 15), 1),
+        100
+    );
+
+    $query = Sale::query()
+        ->with([
+            'customer:id,code,name,category',
+            'location:id,name,code',
+            'creator:id,name',
+            'confirmedBy:id,name',
+        ])
+        ->withCount('items');
+
+    $this->applyLocationScope(
+        $query,
+        $request->user()
+    );
+
+    $sales = $query
+        ->when(
+            $filters['status'] ?? null,
+            fn (Builder $query, string $status) =>
+                $query->where('status', $status)
+        )
+        ->when(
+            $filters['payment_status'] ?? null,
+            fn (Builder $query, string $paymentStatus) =>
+                $query->where(
+                    'payment_status',
+                    $paymentStatus
+                )
+        )
+        ->when(
+            $filters['date_from'] ?? null,
+            fn (Builder $query, string $dateFrom) =>
+                $query->whereDate(
+                    'sale_date',
+                    '>=',
+                    $dateFrom
+                )
+        )
+        ->when(
+            $filters['date_to'] ?? null,
+            fn (Builder $query, string $dateTo) =>
+                $query->whereDate(
+                    'sale_date',
+                    '<=',
+                    $dateTo
+                )
+        )
+        ->when(
+            $filters['search'] ?? null,
+            function (
+                Builder $query,
+                string $search
             ) {
-                $search = trim($request->input("search"));
-
-                $query->where(function (Builder $query) use ($search) {
+                $query->where(function (
+                    Builder $query
+                ) use ($search) {
                     $query
-                        ->where("sale_number", "like", "%{$search}%")
+                        ->where(
+                            'sale_number',
+                            'like',
+                            "%{$search}%"
+                        )
                         ->orWhereHas(
-                            "customer",
-                            fn(Builder $query) => $query->where(
-                                "name",
-                                "like",
-                                "%{$search}%",
-                            ),
+                            'customer',
+                            fn (Builder $customerQuery) =>
+                                $customerQuery->where(
+                                    'name',
+                                    'like',
+                                    "%{$search}%"
+                                )
                         );
                 });
-            })
-            ->latest("sale_date")
-            ->paginate($perPage)
-            ->withQueryString();
+            }
+        )
+        ->latest('sale_date')
+        ->paginate($perPage)
+        ->withQueryString();
 
-        $sales
-            ->getCollection()
-            ->transform(fn(Sale $sale) => $this->addRemainingAmount($sale));
+    $sales->getCollection()->transform(
+        fn (Sale $sale) =>
+            $this->addRemainingAmount($sale)
+    );
 
-        return response()->json($sales);
-    }
+    return response()->json($sales);
+}
 
     public function store(StoreSaleRequest $request): JsonResponse
     {

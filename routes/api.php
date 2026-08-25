@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserPermissionController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\SalaryController;
+use App\Http\Controllers\Api\SaleReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -280,7 +281,7 @@ Route::middleware("auth:sanctum")->group(function () {
     Route::apiResource(
         "purchase-receipts",
         PurchaseReceiptController::class,
-    )->except("destroy");
+    );
 
     Route::apiResource("customers", CustomerController::class)->only([
         "index",
@@ -302,6 +303,8 @@ Route::middleware("auth:sanctum")->group(function () {
         "show",
         "update",
     ]);
+
+    Route::get('/sales/report/pdf',SaleReportController::class)->middleware('can:sales.view');
 
     Route::get(
     '/sale-returns/options',
@@ -327,6 +330,8 @@ Route::post(
     '/sale-returns/{saleReturn}/refunds',
     [SaleRefundController::class, 'store']
 );
+
+    Route::get('/sale-returns/{saleReturn}/pdf', [SaleReturnController::class, 'downloadPdf']);
 
 Route::apiResource(
     'sale-returns',
@@ -374,11 +379,17 @@ Route::apiResource(
     ExpenseCategoryController::class,
 )->only(["index", "store", "show", "update"]);
 
+    Route::get(
+        '/expenses/{expense}/pdf',
+        [ExpenseController::class, 'downloadPdf']
+    )->name('expenses.pdf');
+
 Route::apiResource("expenses", ExpenseController::class)->only([
     "index",
     "store",
     "show",
     "update",
+    'downloadPdf'
 ]);
     Route::post('/expenses/{expense}/mark-paid', [ExpenseController::class, 'markPaid']);
 
@@ -388,5 +399,9 @@ Route::apiResource("expenses", ExpenseController::class)->only([
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 
     Route::apiResource('employees', EmployeeController::class);
+    Route::get(
+        '/salaries/{salary}/pdf',
+        [SalaryController::class, 'downloadPdf']
+    )->name('salaries.pdf');
     Route::apiResource('salaries', SalaryController::class);
 });

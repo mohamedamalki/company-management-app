@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
+            $table->foreignId('location_id')
+                    ->constrained('locations')
+                    ->onDelete('cascade');
             $table->string('position');
             $table->string('phone');
             $table->timestamps();

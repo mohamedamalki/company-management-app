@@ -6,7 +6,6 @@ import {
     ChevronRight,
     ClipboardCheck,
     ClipboardList,
-    ContactRound,
     LayoutDashboard,
     MapPinned,
     Package,
@@ -73,19 +72,6 @@ const navigationSections = [
         label: "Inventory",
         items: [
             {
-                label: "Location stocks",
-                to: "/app/location-stocks",
-                icon: Warehouse,
-                permission: "location-stocks.view",
-                badgeKey: "lowStockCount",
-            },
-            {
-                label: "Stock movements",
-                to: "/app/stock-movements",
-                icon: PackageOpen,
-                permission: "stock-movements.view",
-            },
-            {
                 label: "Categories",
                 to: "/app/categories",
                 icon: Tags,
@@ -108,6 +94,19 @@ const navigationSections = [
                 to: "/app/product-prices",
                 icon: BadgeDollarSign,
                 permission: "product-prices.view",
+            },
+            {
+                label: "Location stocks",
+                to: "/app/location-stocks",
+                icon: Warehouse,
+                permission: "location-stocks.view",
+                badgeKey: "lowStockCount",
+            },
+            {
+                label: "Stock movements",
+                to: "/app/stock-movements",
+                icon: PackageOpen,
+                permission: "stock-movements.view",
             },
         ],
     },
@@ -137,12 +136,6 @@ const navigationSections = [
     {
         label: "Sales",
         items: [
-            {
-                label: "Customers",
-                to: "/app/customers",
-                icon: ContactRound,
-                permission: "customers.view",
-            },
             {
                 label: "Sales",
                 to: "/app/sales",

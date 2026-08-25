@@ -12,8 +12,7 @@ function EmployeesPage() {
 
         const loadEmployees = async () => {
             try {
-                const response =
-                    await api.get("/employees");
+                const response = await api.get("/employees");
 
                 const body = response.data;
 
@@ -85,9 +84,7 @@ function EmployeesPage() {
             return "Salary set";
         }
 
-        return `${Number(
-            amount
-        ).toLocaleString()} MAD`;
+        return `${Number(amount).toLocaleString()} MAD`;
     };
 
     return (
@@ -128,7 +125,7 @@ function EmployeesPage() {
                 {/* Table */}
                 <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[950px] text-left text-sm">
+                        <table className="w-full min-w-[1100px] text-left text-sm">
                             <thead>
                                 <tr className="border-b border-slate-200 bg-slate-50">
                                     <th className="px-5 py-3 font-medium text-slate-500">
@@ -137,6 +134,10 @@ function EmployeesPage() {
 
                                     <th className="px-5 py-3 font-medium text-slate-500">
                                         Position
+                                    </th>
+
+                                    <th className="px-5 py-3 font-medium text-slate-500">
+                                        Location
                                     </th>
 
                                     <th className="px-5 py-3 font-medium text-slate-500">
@@ -165,7 +166,7 @@ function EmployeesPage() {
                                     }).map((_, index) => (
                                         <tr key={index}>
                                             <td
-                                                colSpan={6}
+                                                colSpan={7}
                                                 className="px-5 py-4"
                                             >
                                                 <div className="h-4 animate-pulse rounded bg-slate-100" />
@@ -176,7 +177,7 @@ function EmployeesPage() {
                                     /* Empty */
                                     <tr>
                                         <td
-                                            colSpan={6}
+                                            colSpan={7}
                                             className="px-5 py-16 text-center"
                                         >
                                             <p className="font-medium text-slate-700">
@@ -252,6 +253,37 @@ function EmployeesPage() {
                                                                 employee.position
                                                             }
                                                         </span>
+                                                    </td>
+
+                                                    {/* Location */}
+                                                    <td className="px-5 py-3.5">
+                                                        {employee.location ? (
+                                                            <div>
+                                                                <p className="font-medium text-slate-700">
+                                                                    {
+                                                                        employee
+                                                                            .location
+                                                                            .name
+                                                                    }
+                                                                </p>
+
+                                                                {employee
+                                                                    .location
+                                                                    .code && (
+                                                                    <p className="mt-0.5 text-xs text-slate-400">
+                                                                        {
+                                                                            employee
+                                                                                .location
+                                                                                .code
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-500">
+                                                                No location
+                                                            </span>
+                                                        )}
                                                     </td>
 
                                                     {/* Email */}

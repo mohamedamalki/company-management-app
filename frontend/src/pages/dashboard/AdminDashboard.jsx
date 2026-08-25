@@ -577,13 +577,12 @@ function AdminDashboard() {
                   Operational intelligence
                 </p>
                 <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
-                  Depot performance
+                  Depots performance
                 </h1>
               </div>
             </div>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">
-              Welcome, {user?.name ?? "Admin"}. Analyze sales, purchasing,
-              returns, and stock health for the entire company or one location.
+              Welcome, {user?.name ?? "Admin"}.
             </p>
           </div>
 

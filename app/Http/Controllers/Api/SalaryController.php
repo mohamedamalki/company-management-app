@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSalaryRequest;
 use App\Http\Requests\UpdateSalaryRequest;
 use App\Models\Salary;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class SalaryController extends Controller
@@ -62,5 +63,29 @@ class SalaryController extends Controller
         return response()->json([
             'message' => 'salary deleted successfully'
         ]);
+    }
+
+        public function downloadPdf(Salary $salary)
+    {
+        $salary->load('employee');
+
+        $pdf = Pdf::loadView(
+            'pdf.salary',
+            [
+                'salary' => $salary,
+            ]
+        )->setPaper('a4', 'portrait');
+
+        $employeeName = $salary->employee
+            ? "{$salary->employee->first_name}-{$salary->employee->last_name}"
+            : 'employee';
+
+        $month = $salary->salary_month
+            ? $salary->salary_month->format('Y-m')
+            : 'salary';
+
+        return $pdf->download(
+            "salary-{$employeeName}-{$month}.pdf"
+        );
     }
 }

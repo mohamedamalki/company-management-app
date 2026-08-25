@@ -122,10 +122,6 @@ function getMovementDirection(movement) {
   );
 }
 
-/**
- * Use the balance difference as the displayed
- * quantity. Fall back to movement.quantity.
- */
 function getMovementQuantity(movement) {
   const quantityBefore = Number(
     movement.quantity_before ?? 0,
@@ -343,7 +339,7 @@ function StockMovementsPage() {
         {canManage && (
           <Link
             to="/app/stock-movements/create"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
           >
             <PackageOpen size={18} />
             Record movement

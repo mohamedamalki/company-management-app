@@ -14,6 +14,7 @@ use App\Models\Salary;
 use App\Models\Supplier;
 use App\Models\TaxRate;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -866,6 +867,31 @@ class ExpenseController extends Controller implements HasMiddleware
             $this->loadExpense($expense)
         );
     }
+
+    public function downloadPdf(
+    Request $request,
+    Expense $expense
+) {
+    $this->ensureLocationAccess(
+        $request->user(),
+        $expense->location_id
+    );
+
+    $expense = $this->loadExpense(
+        $expense
+    );
+
+    $pdf = Pdf::loadView(
+        'pdf.expense',
+        [
+            'expense' => $expense,
+        ]
+    )->setPaper('a4', 'portrait');
+
+    return $pdf->download(
+        "expense-{$expense->expense_number}.pdf"
+    );
+}
 
     /*
     |--------------------------------------------------------------------------

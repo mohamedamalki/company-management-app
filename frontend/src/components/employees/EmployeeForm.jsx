@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import api from "../../api/axios";
 
 const initialForm = {
     first_name: "",
@@ -7,6 +8,7 @@ const initialForm = {
     email: "",
     phone: "",
     position: "",
+    location_id: "",
 };
 
 function EmployeeForm({
@@ -24,7 +26,60 @@ function EmployeeForm({
         email: initialData.email ?? "",
         phone: initialData.phone ?? "",
         position: initialData.position ?? "",
+        location_id: initialData.location_id ?? "",
     });
+
+    const [locations, setLocations] = useState([]);
+    const [locationsLoading, setLocationsLoading] = useState(true);
+    const [locationsError, setLocationsError] = useState("");
+
+    useEffect(() => {
+        let cancelled = false;
+
+        const loadLocations = async () => {
+            try {
+                setLocationsLoading(true);
+                setLocationsError("");
+
+                const response = await api.get("/locations");
+
+                const body = response.data;
+
+                const data = Array.isArray(body.data)
+                    ? body.data
+                    : Array.isArray(body.data?.data)
+                      ? body.data.data
+                      : Array.isArray(body.locations)
+                        ? body.locations
+                        : Array.isArray(body)
+                          ? body
+                          : [];
+
+                if (!cancelled) {
+                    setLocations(data);
+                }
+            } catch (error) {
+                console.error(error);
+
+                if (!cancelled) {
+                    setLocationsError(
+                        error.response?.data?.message ??
+                            "Unable to load locations."
+                    );
+                }
+            } finally {
+                if (!cancelled) {
+                    setLocationsLoading(false);
+                }
+            }
+        };
+
+        loadLocations();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -44,6 +99,9 @@ function EmployeeForm({
             email: formData.email.trim(),
             phone: formData.phone.trim(),
             position: formData.position.trim(),
+            location_id: formData.location_id
+                ? Number(formData.location_id)
+                : "",
         });
     };
 
@@ -61,6 +119,7 @@ function EmployeeForm({
             autoComplete="off"
             className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
         >
+            {/* Header */}
             <div className="flex items-start gap-3 border-b border-slate-200 bg-slate-50/80 px-6 py-5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white">
                     {isUpdate ? "✎" : "+"}
@@ -79,14 +138,25 @@ function EmployeeForm({
                 </div>
             </div>
 
+            {/* Form body */}
             <div className="space-y-5 p-6">
+                {/* General error */}
                 {error && (
                     <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                         {error}
                     </div>
                 )}
 
+                {/* Location loading/error */}
+                {locationsError && (
+                    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        {locationsError}
+                    </div>
+                )}
+
+                {/* First name + Last name */}
                 <div className="grid gap-5 sm:grid-cols-2">
+                    {/* First name */}
                     <div>
                         <label
                             htmlFor="first_name"
@@ -111,6 +181,7 @@ function EmployeeForm({
                         />
                     </div>
 
+                    {/* Last name */}
                     <div>
                         <label
                             htmlFor="last_name"
@@ -136,7 +207,9 @@ function EmployeeForm({
                     </div>
                 </div>
 
+                {/* Email + Phone */}
                 <div className="grid gap-5 sm:grid-cols-2">
+                    {/* Email */}
                     <div>
                         <label
                             htmlFor="email"
@@ -161,6 +234,7 @@ function EmployeeForm({
                         />
                     </div>
 
+                    {/* Phone */}
                     <div>
                         <label
                             htmlFor="phone"
@@ -186,31 +260,78 @@ function EmployeeForm({
                     </div>
                 </div>
 
-                <div>
-                    <label
-                        htmlFor="position"
-                        className={labelClass}
-                    >
-                        Position
-                        <span className="ml-1 text-red-500">
-                            *
-                        </span>
-                    </label>
+                {/* Position + Location */}
+                <div className="grid gap-5 sm:grid-cols-2">
+                    {/* Position */}
+                    <div>
+                        <label
+                            htmlFor="position"
+                            className={labelClass}
+                        >
+                            Position
+                            <span className="ml-1 text-red-500">
+                                *
+                            </span>
+                        </label>
 
-                    <input
-                        id="position"
-                        type="text"
-                        name="position"
-                        value={formData.position}
-                        onChange={handleChange}
-                        placeholder="Example: Software Developer"
-                        className={inputClass}
-                        disabled={saving}
-                        required
-                    />
+                        <input
+                            id="position"
+                            type="text"
+                            name="position"
+                            value={formData.position}
+                            onChange={handleChange}
+                            placeholder="Example: Software Developer"
+                            className={inputClass}
+                            disabled={saving}
+                            required
+                        />
+                    </div>
+
+                    {/* Location */}
+                    <div>
+                        <label
+                            htmlFor="location_id"
+                            className={labelClass}
+                        >
+                            Location
+                            <span className="ml-1 text-red-500">
+                                *
+                            </span>
+                        </label>
+
+                        <select
+                            id="location_id"
+                            name="location_id"
+                            value={formData.location_id}
+                            onChange={handleChange}
+                            className={inputClass}
+                            disabled={
+                                saving ||
+                                locationsLoading ||
+                                locations.length === 0
+                            }
+                            required
+                        >
+                            <option value="">
+                                {locationsLoading
+                                    ? "Loading locations..."
+                                    : "Select a location"}
+                            </option>
+
+                            {locations.map((location) => (
+                                <option
+                                    key={location.id}
+                                    value={location.id}
+                                >
+                                    {location.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
 
+            {/* Footer */}
             <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50/80 px-6 py-4 sm:flex-row sm:justify-end">
                 <Link
                     to="/app/employees"
@@ -221,7 +342,11 @@ function EmployeeForm({
 
                 <button
                     type="submit"
-                    disabled={saving}
+                    disabled={
+                        saving ||
+                        locationsLoading ||
+                        locations.length === 0
+                    }
                     className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
                 >
                     {saving ? "Saving..." : submitText}

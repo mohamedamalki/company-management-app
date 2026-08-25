@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../api/axios";
+import DownloadSalaryPdfButton from "../../components/salaries/DownloadSalaryPdfButton";
 
 function SalariesPage() {
     const [salaries, setSalaries] = useState([]);
@@ -276,15 +277,25 @@ function SalariesPage() {
                                                         </span>
                                                     </td>
 
-                                                    {/* Actions */}
-                                                    <td className="px-5 py-3.5 text-right">
-                                                        <Link
-                                                            to={`/app/salaries/${salary.id}/edit`}
-                                                            className="rounded-md px-2.5 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50"
-                                                        >
-                                                            Edit
-                                                        </Link>
-                                                    </td>
+                                                    <td className="px-5 py-3.5">
+  <div className="flex items-center justify-end gap-2">
+    <DownloadSalaryPdfButton
+      salaryId={salary.id}
+      employeeName={
+        employee
+          ? `${employee.first_name} ${employee.last_name}`
+          : "employee"
+      }
+    />
+
+    <Link
+      to={`/app/salaries/${salary.id}/edit`}
+      className="rounded-md px-2.5 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50"
+    >
+      Edit
+    </Link>
+  </div>
+</td>
                                                 </tr>
                                             );
                                         }

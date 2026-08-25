@@ -188,7 +188,7 @@ function LocationStocksPage() {
         {canManage && (
           <Link
             to="/app/location-stocks/create"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
           >
             <PackagePlus size={18} />
 
